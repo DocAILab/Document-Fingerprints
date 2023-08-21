@@ -8,16 +8,16 @@
 
 - [文件目录](#文件目录)
 - [文档哈希指纹生成算法](#文档哈希指纹生成算法)
-  - [Simhash](#1、simhash)
-  - [Minhash](#2、minhash（最小哈希）)
-  - [Karp-Rabin](#3、karp-rabin卡普-拉宾算法)
-  - [Winnowing](#4、winnowing)
-  - [Fuzzy Hash](#5、fuzzy hash)
-  - [FlyHash](#6、flyhash)
-- [文档哈希指纹距离/相似度计算方法](#文档哈希指纹距离/相似度计算方法)
-  - [汉明距离](#1、汉明距离)
-  - [Jaccard相似度](#2、jaccard相似度)
-  - [余弦相似度](#3、余弦相似度)
+  - [Simhash](#simhash)
+  - [Minhash](#minhash)
+  - [Karp-Rabin](#karp-rabin)
+  - [Winnowing](#winnowing)
+  - [Fuzzy Hash](#fuzzy-hash)
+  - [FlyHash](#flyhash)
+- [文档哈希指纹距离/相似度计算方法](#文档哈希指纹距离-相似度计算方法)
+  - [汉明距离](#汉明距离)
+  - [Jaccard相似度](#jaccard相似度)
+  - [余弦相似度](#余弦相似度)
 
 # 文件目录
 
@@ -56,7 +56,7 @@
 
 # 文档哈希指纹生成算法
 
-## 1、Simhash
+## Simhash
 
 **Simhash**是一种用于文本相似性比较的哈希算法， google 用来处理海量文本去重的算法，可以将一个文档转换成一个 64 位的字节（特征字）。Simhash可以基于文本内容的特征向量，对相似的文本生成相似的哈希值（具有较好的局部变化容忍性，对于细微差异的文本可以生成相似的指纹）。
 
@@ -80,7 +80,7 @@
 
 [(107条消息) 文本相似度计算——Simhash算法（python实现）*simhash文本相似度*Trisyp的博客-CSDN博客](https://blog.csdn.net/Trisyp/article/details/113623966?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-1-113623966-blog-104106867.235%5Ev38%5Epc_relevant_anti_t3_base&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-1-113623966-blog-104106867.235%5Ev38%5Epc_relevant_anti_t3_base&utm_relevant_index=2)
 
-## 2、Minhash（最小哈希）
+## Minhash
 
 Minhash是一种用于**集合**相似性比较的哈希算法，可以用于处理文本的相似性。通过对文本内容进行集合表示，然后使用Minhash算法生成指纹。相似的文本内容会生成相似的Minhash指纹。主要用于计算两个集合的Jaccard相似度，其中Jaccard相似度表示两个集合的交集大小与并集大小的比值。
 
@@ -108,7 +108,7 @@ Minhash是一种用于**集合**相似性比较的哈希算法，可以用于处
 
 minhash和simhash都属于局部敏感哈希（Local Sensitive Hash）。一般的哈希算法对于相似文本的哈希结果可能差别非常大，局部敏感哈希在普通哈希的基础上保留了一定程度的相似性，即相似文本的哈希结果距离较小。
 
-## 3、Karp-Rabin卡普-拉宾算法
+## Karp-Rabin
 
 Karp-Rabin是一种字符串匹配算法，用于在一个长文本中高效地查找一个短模式的出现位置。该算法是由Michael O. Rabin和Richard M. Karp于1987年提出的。
 
@@ -141,7 +141,7 @@ Karp-Rabin算法生成的指纹可能无法准确反映字符串的相似性，�
 
 Karp-Rabin算法生成的文本指纹在相同位置具有相同的滑动窗口内容时，其指纹将会相同，导致相似度为1.0。为增加指纹的唯一性，可以尝试调整滑动窗口的大小或选择不同的哈希函数。
 
-## 4、Winnowing
+## Winnowing
 
 Winnowing算法是一种用于文本数据的局部散列算法，主要用于文本去重和查找近似重复的文本片段。该算法基于散列函数，可以快速地生成文本的指纹，从而方便地进行文本相似性的计算。Winnowing可以有效地识别重复的文本段落或者检测抄袭文本。
 
@@ -177,7 +177,7 @@ Winnowing算法是一种用于文本数据的局部散列算法，主要用于�
 
 k-grams+Winnowing算法主要用于文本相似度计算，特别是对于较长文本的相似度比较。通过局部特征的表示，可以捕捉文本的相似部分，而Winnowing算法的局部最小哈希选择策略能够进一步减少指纹的维度，提高计算效率。这种算法适用于大规模文本相似度比较和查重等应用场景。
 
-## 5、Fuzzy Hash
+## Fuzzy Hash
 
 ssdeep 是一个用来计算context triggered piecewise hashes(CTPH) 基于文本的分片哈希算法，同样也可以叫做模糊哈希Fuzzy hashes。CTPH可以匹配同源文档（相似文档），这样的文档可能有一些顺序相同的字节，尽管这些字节可能在一个序列中长度和内容都不尽相同。ssdeep 对文本长度有要求，如果要生成有意义的结果，最好文本长度不小于 4096。
 
@@ -187,7 +187,7 @@ ssdeep的主要原理是使用一个弱哈希计算文件局部内容，在特�
 
 [CTPH工作原理](https://www.sciencedirect.com/science/article/pii/S1742287606000764?via%3Dihub)
 
-## 6、FlyHash
+## FlyHash
 
 FlyHash 是一种LSH算法，它将输入数据映射到稀疏哈希嵌入，其中哈希嵌入的维度远大于输入，并将输入数据的位置保留在哈希嵌入中。
 
@@ -200,7 +200,7 @@ FlyHash被设计为计算成本低廉，但内存效率低。它适用于散列�
 
 Jaccard相似度适用于集合数据的相似度计算，汉明距离适用于等长字符串的相似度计算，Simhash相似度适用于保持文本信息的压缩指纹计算，Minhash相似度适用于大规模数据集的近似相似度计算，Karp-Rabin相似度适用于文本数据的快速相似度估计，Winnowing相似度适用于滑动窗口处理的文本相似度计算。
 
-## 1、汉明距离
+## 汉明距离
 
 汉明距离（Hamming distance）是一种衡量两个等长字符串之间差异的度量方法。它用于计算两个字符串在相同位置上不同字符的个数。换句话说，汉明距离衡量了将一个字符串转换为另一个字符串所需的最小替换次数。
 
@@ -215,7 +215,7 @@ Jaccard相似度适用于集合数据的相似度计算，汉明距离适用于�
 
 N-gram特征：N-gram是一种将文本切分为连续的N个字符或单词的方法。对于每个字符串，我们可以将其切分为N-gram，并统计每个N-gram在字符串中出现的次数，形成一个特征向量。然后，通过比较两个特征向量之间的相似度，可以得到两个不等长字符串的相似度。
 
-## 2、Jaccard相似度
+## Jaccard相似度
 
 Jaccard相似度是一种用于计算两个集合之间相似性的指标，它衡量两个集合的交集元素与并集元素之间的比例。Jaccard相似度的取值范围在0到1之间，其中0表示两个集合没有共同的元素，1表示两个集合完全相同。
 
@@ -226,7 +226,7 @@ Jaccard相似度在数据处理和信息检索中广泛应用，特别适用于�
 2. 然后，计算两个集合的并集，即两个集合中所有的元素，包括重复的元素。
 3. 最后，用交集的大小除以并集的大小，得到Jaccard相似度。
 
-## 3、余弦相似度
+## 余弦相似度
 
 余弦相似度（Cosine Similarity）是一种常用的相似度计算方法，它可以用于衡量两个向量之间的相似程度。在文本相似度计算中，可以将文本表示成向量，然后使用余弦相似度来比较两个文本的相似性。
 
