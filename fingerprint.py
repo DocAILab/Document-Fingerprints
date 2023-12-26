@@ -1,16 +1,6 @@
 """
 整合哈希指纹生成和相似度计算/距离计算方法。
 """
-import hashlib
-import ssdeep
-import Levenshtein
-from simhash import Simhash
-import simhash
-from nltk import ngrams
-from datasketch import MinHash
-import pyssdeep
-import numpy as np
-from flyhash import FlyHash
 from hashes import *
 from similarities import *
 

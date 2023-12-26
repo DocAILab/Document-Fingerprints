@@ -9,43 +9,72 @@ from datasketch import MinHash
 from utils import remove_stopwords
 import gensim.downloader as api
 
+
 # 汉明距
 # jaccard
 # WMD
+# levenshtein
+# tfidf-based cosine
 
-def hamming_distance(fingerprint1, fingerprint2, cal_simi=True, dim=None):
+def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
     """
     计算两个指纹的汉明距离。
-    :param fingerprint1: 第一个指纹
-    :param fingerprint2: 第二个指纹
+    :param fingerprint1: 第一个指纹, 可以是Simhash, int或str
+    :param fingerprint2: 第二个指纹, 可以是Simhash, int或str（需保证两个指纹等长）
     :param cal_simi: 是否计算相似度
-    :param dim: 指纹维度，当fingerprint为int，且需计算相似度时必须输入
     :return: 汉明距离, [相似度]
     """
     if isinstance(fingerprint1, Simhash):
-        # xor_result = fingerprint1.value ^ fingerprint2.value
-        # hamming_dist = bin(xor_result).count('1')
         hamming_dist = fingerprint1.distance(fingerprint2)
         if cal_simi:
+            if fingerprint1.f != fingerprint2.f:
+                raise ValueError("fingerprint1 and fingerprint2 in type of Simhash must have same dimension!")
             simi = 1 - (hamming_dist / fingerprint1.f)  # fingerprint1.f为simhash指纹维度
             return hamming_dist, simi
         return hamming_dist
     elif isinstance(fingerprint1, int):
+        bin1 = bin(fingerprint1)[2:]
+        bin2 = bin(fingerprint2)[2:]
+        if len(bin1) != len(bin2):
+            raise ValueError("input fingerprints in type of int must have same dimension!")
         xor_result = fingerprint1 ^ fingerprint2
         hamming_dist = bin(xor_result).count('1')
         if cal_simi:
-            if dim is None:
-                raise ValueError("parameter 'dim' must be int!")
-            simi = 1 - (hamming_dist / dim)
+            simi = 1 - (hamming_dist / len(bin1))
             return hamming_dist, simi
         return hamming_dist
     elif isinstance(fingerprint1, str):
-        hamming_dist = sum(bit1 != bit2 for bit1, bit2 in zip(fingerprint1, fingerprint2))
+        if len(fingerprint1) != len(fingerprint2):
+            raise ValueError("input fingerprints in type of str must have same dimension!")
+        hamming_dist = sum(bit1 != bit2 for bit1, bit2 in zip(list(fingerprint1), list(fingerprint2)))
         if cal_simi:
             dim = len(fingerprint1)
             simi = 1 - (hamming_dist / dim)
             return hamming_dist, simi
         return hamming_dist
+    else:
+        raise TypeError("input fingerprints must be in type of Simhash, int or str")
+
+
+def jaccard_similarity(data1, data2):
+    """
+    计算集合的jaccard相似度。
+    :param data1: 第一个数据，set/list/MinHash
+    :param data2: 第二个数据，set/list/MinHash
+    :return: jaccard值，float
+    """
+    if isinstance(data1, set):
+        intersection = len(data1.intersection(data2))
+        union = len(data1.union(data2))
+        return intersection / union
+    elif isinstance(data1, list):
+        data1 = set(data1)
+        data2 = set(data2)
+        intersection = len(data1.intersection(data2))
+        union = len(data1.union(data2))
+        return intersection / union
+    elif isinstance(data1, MinHash):
+        return data1.jaccard(data2)  # 使用minhash估计的jaccard值
 
 
 def levenshtein_distance(text1, text2, cal_simi=True):
@@ -78,27 +107,6 @@ def wmd_distance(text1, text2):
     return dist
 
 
-def jaccard_similarity(data1, data2):
-    """
-    计算集合的jaccard相似度。
-    :param data1: 第一个数据，set/list/MinHash
-    :param data2: 第二个数据，set/list/MinHash
-    :return: jaccard值，float
-    """
-    if isinstance(data1, set):
-        intersection = len(data1.intersection(data2))
-        union = len(data1.union(data2))
-        return intersection / union
-    elif isinstance(data1, list):
-        data1 = set(data1)
-        data2 = set(data2)
-        intersection = len(data1.intersection(data2))
-        union = len(data1.union(data2))
-        return intersection / union
-    elif isinstance(data1, MinHash):
-        return data1.jaccard(data2)  # 使用minhash估计的jaccard值
-
-
 def tfidf_based_cosine_similarity(text1, text2):
     """
     基于TF-IDF计算两个文本之间的余弦相似度。
@@ -112,3 +120,10 @@ def tfidf_based_cosine_similarity(text1, text2):
     return cosine_sim
 
 
+if __name__ == "__main__":
+    print("This is a test for calculating similarities.")
+    str1 = '北京增值税电子普通发票.pdf'
+    str2 = '福建增值税电子普通发票.pdf'
+    str3 = '福建工程学院计算机学院培养方案.pdf'
+
+    print(tfidf_based_cosine_similarity(str1, str2))

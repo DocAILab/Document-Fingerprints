@@ -122,18 +122,31 @@ def fp_with_winnowing(text, k=5, w=5):
     # 计算k-grams的哈希值列表
     hashes = []
     for kgram in kgrams:
-        hashes.append(hashlib.md5(kgram.encode()).hexdigest())  # 可使用其他哈希函数
-
+        # 也可以换其他hash
+        hash_value = hashlib.sha1(kgram.encode('utf-8'))
+        hash_value = hash_value.hexdigest()[-4:]
+        hash_value = int(hash_value, 16)  # using last 16 bits of sha-1 digest
+        hashes.append(hash_value)
     # 使用Winnowing算法从哈希列表中生成文本的指纹
     min_hashes = []
 
-    ## 找到初始窗口中的最小哈希值
-    min_hash = min(hashes[:w])
+    # 找到初始窗口中的最小哈希值(若有重复选最右边)
+    min_pos, min_hash = 0, hashes[0]
+    for i, x in enumerate(hashes[0:w]):
+        if x <= min_hash:
+            min_pos, min_hash = i, x
     min_hashes.append(min_hash)
 
-    ## 滑动窗口，选择局部最小哈希值
+    # 滑动窗口，选择局部最小哈希值
     for i in range(1, len(hashes) - w + 1):
-        if hashes[i + w - 1] < min_hash:
+        if min_pos < i:
+            min_pos, min_hash = i, hashes[i]
+            for pos, x in enumerate(hashes[i:w + i]):
+                if x <= min_hash:
+                    min_pos, min_hash = pos + i, x
+            min_hashes.append(min_hash)
+        elif hashes[i + w - 1] <= min_hash:
+            min_pos = i + w - 1
             min_hash = hashes[i + w - 1]
             min_hashes.append(min_hash)
 
@@ -169,3 +182,9 @@ def fp_with_flyhash(data, input_dim, hash_dim):
     # flyhash的工作时以维度为单位对数据进行随机，与文档信息或许不是很配合
     flyHash = FlyHash(input_dim, hash_dim)
     return flyHash(data)
+
+
+if __name__ == "__main__":
+    # 测试方法
+    text = "This is a test text."
+    simhash = fp_with_simhash2(text)
