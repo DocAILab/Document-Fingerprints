@@ -1,6 +1,7 @@
 """
 文档指纹的相似度计算算法集合
 """
+import numpy as np
 from simhash import Simhash
 import Levenshtein
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -8,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from datasketch import MinHash
 from utils import remove_stopwords
 import gensim.downloader as api
+from scipy.spatial import distance
 
 
 # 汉明距
@@ -118,6 +120,62 @@ def tfidf_based_cosine_similarity(text1, text2):
     tfidf_matrix = vectorizer.fit_transform([text1, text2])
     cosine_sim = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
     return cosine_sim
+
+
+def manhattan_similarity(text1, text2):
+    """
+    计算两个文本之间的曼哈顿相似度
+
+    Parameters:
+    - text1: 第一个文本
+    - text2: 第二个文本
+    - vectorizer: 词袋模型向量化器
+
+    Returns:
+    - 曼哈顿相似度
+    """
+    vectorizer = TfidfVectorizer(use_idf=True, norm='l2')
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])
+
+    vector1 = tfidf_matrix[0].toarray().flatten()
+    vector2 = tfidf_matrix[1].toarray().flatten()
+
+    manhattan_dist = distance.cityblock(vector1, vector2)
+    similarity = 1 / (1 + manhattan_dist)  # 将距离转化为相似度
+    return similarity
+
+
+def mahalanobis_distance(text1, text2, cov_estimator=None):
+    """
+    计算两个文档指纹之间的马氏距离
+
+    Parameters:
+    - fingerprint1: 第一个文档指纹
+    - fingerprint2: 第二个文档指纹
+    - cov_estimator: 协方差矩阵估计器，默认为None，表示使用单位矩阵
+
+    Returns:
+    - 马氏距离
+    """
+    vectorizer = TfidfVectorizer(use_idf=True, norm='l2')
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])
+
+    vector1 = tfidf_matrix[0].toarray().flatten()
+    vector2 = tfidf_matrix[1].toarray().flatten()
+
+    # 如果未提供协方差矩阵估计器，则使用单位矩阵
+    if cov_estimator is None:
+        cov_matrix = np.identity(len(vector1))
+    else:
+        cov_matrix = cov_estimator.fit([vector1, vector2]).covariance_
+
+    # 计算马氏距离
+    mahalanobis_dist = distance.mahalanobis(vector1, vector2, np.linalg.inv(cov_matrix))
+    
+    # 将马氏距离映射为相似度
+    similarity = np.exp(-0.5 * mahalanobis_dist ** 2)
+
+    return mahalanobis_dist
 
 
 if __name__ == "__main__":
