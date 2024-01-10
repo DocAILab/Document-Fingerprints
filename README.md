@@ -30,27 +30,25 @@
 │  requirements.txt
 │  关于EMD和WMD.pdf
 │  指纹生成算法-测试细节.docx
+│  文件指纹生成算法.md
 │
-├─tests
+├─doc picture # md文件的图片
+│
+├─fp_generate_methods # 指纹生成hash方法
+│      Fuzzyhash.py # Fuzzyhash计算相似度
+│      Flyhash.py # Flyhash计算相似度
+│      Minhash.py # MinHash和Jaccard计算集合的指纹和相似度
+│      Simhash.py # 使用simhash库实现文本指纹计算、相似度计算
+│      Winnowing.py # winnowing计算文本指纹
+├─tests #各种测试文件
 │    dict.py  # 字典转字符串用Simhash生成指纹，用汉明距/编辑距离计算相似度
-│    Simhash.py  # 使用simhash库实现文本指纹计算、相似度计算
 │    Simhash+LSH.py  # simhash计算文本指纹，LSH+汉明距+余弦（TFIDF）计算文本列表相似度
 │    Simhash+LSH-2.py  # 使用simhash库实现文本指纹计算、相似度计算和查询
 │    测试.py  # 使用simhash库实现文本指纹计算和相似度计算
-│  
-│    Minhash.py  # MinHash和Jaccard计算集合的指纹和相似度
-│  
 │    Karp-Rabin.py  # Karp-Rabin哈希+汉明距，计算文本相似度
-│    Karp-Rabin2.py  # Karp-Rabin哈希的另一种逻辑
-│  
-│    Winnowing.py  # winnowing计算文本指纹
-│    Winnowing2.py  # Winnowing.py中函数拆分写了，还多一个基于汉明距的相似度计算
 │    set.py  # Winnowing计算集合的指纹+jaccard相似度
-│  
 │    OCR.py  # Fuzzy hashes & flyhash 两个哈希算法
-│
 │    N-gram+LSH.py  # N-gram+汉明距计算文本相似度
-│  
 │    run_wmd.py  # 基于WMD的文本距离计算
 ```
 

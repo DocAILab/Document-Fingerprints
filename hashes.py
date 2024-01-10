@@ -2,7 +2,6 @@
 生成文档指纹的哈希算法集合
 """
 import hashlib
-import ssdeep
 import Levenshtein
 from simhash import Simhash
 import simhash

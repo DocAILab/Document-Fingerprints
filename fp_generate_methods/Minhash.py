@@ -37,7 +37,7 @@ def jaccard_similarity2(set1, set2):
 
 # 一个用于在大规模数据中进行快速相似项查询的方法
 def minhashLSH_search(minhash_sets, query_set, threshold=0.5, num_perm=128):
-    lsh = MinHashLSH(threshold=threshold, num_perm=num_perm)  # threshhold是判定是否相似的jaccard阈值
+    lsh = MinHashLSH(threshold=threshold, num_perm=num_perm)  # threshhold是判定是否相似的jaccard阈值（初始化的 MinHash LSH 将通过最小化误报和漏报来针对阈值进行优化。）
     for name, set in minhash_sets.items():
         lsh.insert(name, set)
     return lsh.query(query_set)

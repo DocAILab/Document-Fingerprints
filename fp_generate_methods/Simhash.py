@@ -1,6 +1,5 @@
 from simhash import Simhash, SimhashIndex
 
-
 def generate_simhash_fingerprint(text):
     simhash = Simhash(text)  # 默认指纹维度64，hash_func默认md5
     # 返回一个十六进制hash指纹
