@@ -1,0 +1,9 @@
+abstracts-*.jsonl：jsonl 文件，包含作为数据集一部分的查询和候选的论文 ID、摘要和标题。共163170条
+
+*-queries-release.csv：与每个查询关联的元数据。（paper id和title对应的表格数据）。共3274条
+
+test-pid2anns-*.json：JSON 文件，其中包含数据集中每个查询论文的查询论文 ID、候选论文 ID 和相关性标签。
+将这些文件与abstracts-*.jsonl 结合使用来生成用于模型评估的文件。共3190条query，候选文档的长度有{53, 54, 56, 57, 58, 59, 60}几种，相似度评价范围有{0, 1, 2}几种
+
+*-evaluation_splits.json：用于报告评估数字的拆分的论文 ID。 论文github库中包含 aspire/src/evaluation/ranking_eval.py，它实现了评估协议并计算评估指标。
+请参阅论文，了解我们建议报告评估指标的实验方案的描述。dev共1637条, test共1637条
