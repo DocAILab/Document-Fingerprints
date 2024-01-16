@@ -31,6 +31,20 @@ def levenshtein_distance(text1, text2, cal_simi=True):
         return dist, simi
     return dist
 
+def jaccard_similarity(data1, data2):
+    """
+    计算jaccard相似度。
+    :param data1: 第一个数据，set/list/MinHash
+    :param data2: 第二个数据，set/list/MinHash
+    :return: jaccard值，float
+    """
+    data1 = set(list(data1))
+    data2 = set(list(data2))
+    intersection = len(data1.intersection(data2))
+    union = len(data1.union(data2))
+    return intersection / union
+
+
 if __name__ == "__main__":
     str1 = '北京增值税电子普通发票.pdf'
     str2 = '福建增值税电子普通发票.pdf'
@@ -57,6 +71,15 @@ if __name__ == "__main__":
     similarity2_13 = levenshtein_distance(fingerprint1, fingerprint3)
     similarity2_23 = levenshtein_distance(fingerprint2, fingerprint3)
 
-    print(f"自实现相似度1和2: {similarity2_12}")
-    print(f"自实现相似度1和3: {similarity2_13}")
-    print(f"自实现相似度2和3: {similarity2_23}")
+    print(f"自实现编辑距离相似度1和2: {similarity2_12}")
+    print(f"自实现编辑距离相似度1和3: {similarity2_13}")
+    print(f"自实现编辑距离相似度2和3: {similarity2_23}")
+
+    # 计算相似度3
+    similarity3_12 = jaccard_similarity(fingerprint1, fingerprint2)
+    similarity3_13 = jaccard_similarity(fingerprint1, fingerprint3)
+    similarity3_23 = jaccard_similarity(fingerprint2, fingerprint3)
+
+    print(f"自实现jaccard相似度1和2: {similarity3_12}")
+    print(f"自实现jaccard相似度1和3: {similarity3_13}")
+    print(f"自实现jaccard相似度2和3: {similarity3_23}")

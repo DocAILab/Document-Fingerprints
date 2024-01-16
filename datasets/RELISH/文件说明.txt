@@ -1,3 +1,5 @@
+4个文件的下载链接：https://figshare.com/articles/dataset/RELISH-Aspire/19425506?file=34514726
+
 abstracts-*.jsonl：jsonl 文件，包含作为数据集一部分的查询和候选的论文 ID、摘要和标题。共163170条
 
 *-queries-release.csv：与每个查询关联的元数据。（paper id和title对应的表格数据）。共3274条

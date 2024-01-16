@@ -24,7 +24,7 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
     :param fingerprint1: 第一个指纹, 可以是Simhash, int或str
     :param fingerprint2: 第二个指纹, 可以是Simhash, int或str（需保证两个指纹等长）
     :param cal_simi: 是否计算相似度
-    :return: 汉明距离, [相似度]
+    :return: 汉明距离 / 相似度
     """
     if isinstance(fingerprint1, Simhash):
         hamming_dist = fingerprint1.distance(fingerprint2)
@@ -32,9 +32,9 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
             if fingerprint1.f != fingerprint2.f:
                 raise ValueError("fingerprint1 and fingerprint2 in type of Simhash must have same dimension!")
             simi = 1 - (hamming_dist / fingerprint1.f)  # fingerprint1.f为simhash指纹维度
-            return hamming_dist, simi
+            return simi
         return hamming_dist
-    elif isinstance(fingerprint1, int):
+    if isinstance(fingerprint1, int):
         bin1 = bin(fingerprint1)[2:]
         bin2 = bin(fingerprint2)[2:]
         if len(bin1) != len(bin2):
@@ -43,7 +43,7 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
         hamming_dist = bin(xor_result).count('1')
         if cal_simi:
             simi = 1 - (hamming_dist / len(bin1))
-            return hamming_dist, simi
+            return simi
         return hamming_dist
     elif isinstance(fingerprint1, str):
         if len(fingerprint1) != len(fingerprint2):
@@ -52,7 +52,7 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
         if cal_simi:
             dim = len(fingerprint1)
             simi = 1 - (hamming_dist / dim)
-            return hamming_dist, simi
+            return simi
         return hamming_dist
     else:
         raise TypeError("input fingerprints must be in type of Simhash, int or str")
@@ -85,17 +85,17 @@ def levenshtein_distance(text1, text2, cal_simi=True):
     :param text1: 第一个文本
     :param text2: 第二个文本
     :param cal_simi: 是否计算相似度
-    :return: 编辑距离, [相似度]
+    :return: 编辑距离 / 相似度
     """
     dist = Levenshtein.distance(text1, text2)
     if cal_simi:
         max_length = max(len(text1), len(text2))
         simi = 1 - (dist / max_length)
-        return dist, simi
+        return simi
     return dist
 
 
-def wmd_distance(text1, text2):
+def wmd_distance(text1, text2):  # TODO: 把距离转换成相似度
     """
     计算两个文本之间的wmd距离。
     :param text1: 第一个文本，str
@@ -109,7 +109,7 @@ def wmd_distance(text1, text2):
     return dist
 
 
-def tfidf_based_cosine_similarity(text1, text2):
+def tfidf_based_cosine_similarity(text1, text2):  # TODO: 关于tfidf的计算还需要再研究一下
     """
     基于TF-IDF计算两个文本之间的余弦相似度。
     :param text1: 第一个文本
@@ -145,7 +145,7 @@ def manhattan_similarity(text1, text2):
     return similarity
 
 
-def mahalanobis_distance(text1, text2, cov_estimator=None):
+def mahalanobis_distance(text1, text2, cov_estimator=None, cal_simi=True):  # TODO: 距离转换成相似度
     """
     计算两个文档指纹之间的马氏距离
 
@@ -153,6 +153,7 @@ def mahalanobis_distance(text1, text2, cov_estimator=None):
     - fingerprint1: 第一个文档指纹
     - fingerprint2: 第二个文档指纹
     - cov_estimator: 协方差矩阵估计器，默认为None，表示使用单位矩阵
+    - cal_simi: 是否计算相似度，默认为True
 
     Returns:
     - 马氏距离
@@ -171,10 +172,12 @@ def mahalanobis_distance(text1, text2, cov_estimator=None):
 
     # 计算马氏距离
     mahalanobis_dist = distance.mahalanobis(vector1, vector2, np.linalg.inv(cov_matrix))
-    
+
     # 将马氏距离映射为相似度
     similarity = np.exp(-0.5 * mahalanobis_dist ** 2)
 
+    if cal_simi:
+        return similarity
     return mahalanobis_dist
 
 

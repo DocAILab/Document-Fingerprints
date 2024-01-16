@@ -1,10 +1,11 @@
 import codecs
 import os
 import json
-from dataset import EvalDataset
+from evaluation.dataset import EvalDataset
 from typing import Dict
 
 FACETS = ('background', 'method', 'result')
+
 
 def batchify(dataset: Dict, batch_size: int):
     """
@@ -25,6 +26,7 @@ def batchify(dataset: Dict, batch_size: int):
     if len(batch) > 0:
         yield pids, batch
 
+
 def get_scores_filepath(root_path, model_name, run_name, dataset, facet):
     if facet is None:
         filename = f'test-pid2pool-{dataset}-{model_name}-ranked.json'
@@ -34,6 +36,7 @@ def get_scores_filepath(root_path, model_name, run_name, dataset, facet):
     if run_name is not None:
         scores_dir = os.path.join(scores_dir, run_name)
     return os.path.join(scores_dir, filename)
+
 
 def get_cache_dir(cache_basedir,
                   dataset_name,
@@ -46,8 +49,9 @@ def get_cache_dir(cache_basedir,
 
     # create dir if path does not exist
     if not os.path.exists(cache_path):
-        create_dir(cache_path)
+        os.makedirs(cache_path)
     return cache_path
+
 
 def get_results_dir(results_basedir, dataset_name, model_name, run_name):
     results_dir = os.path.join(results_basedir, dataset_name, model_name)
@@ -55,19 +59,31 @@ def get_results_dir(results_basedir, dataset_name, model_name, run_name):
         results_dir = os.path.join(results_dir, run_name)
     return results_dir
 
+
 def get_scores_filename(results_dir, facet):
     filename = 'scores.json' if facet is None else f'scores-{facet}.json'
     return os.path.join(results_dir, filename)
 
+
 def get_encodings_filename(results_dir):
     return os.path.join(results_dir, 'encodings.h5')
+
 
 def get_evaluations_filename(results_dir, facet, aggregated):
     metrics_type = 'aggregated' if aggregated else 'query'
     filename = f'{metrics_type}-evaluations.csv' if facet is None else f'{metrics_type}-evaluations-{facet}.csv'
     return os.path.join(results_dir, filename)
 
+
 def load_score_results(results_dir, dataset: EvalDataset, facet):
+    '''
+    get a dict representing gold relevancies of candidates for each query, sorted by model similarity score
+    :param results_dir: the path of scores.json file
+    :param dataset: the dataset object
+    :param facet:
+    :return: a dict of {query_id: [relevancy of candidate 1, relevancy of candidate 2, ...]}
+    (candidate ids are sorted by model similarity score)
+    '''
     # get gold data relevances for facet
     gold_test_data = dataset.get_gold_test_data(facet)
     # get model similarity scores for facet

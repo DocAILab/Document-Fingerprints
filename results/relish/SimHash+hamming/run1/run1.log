@@ -1,0 +1,31 @@
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Wrote: results\relish\SimHash+hamming\run1\scores.json
+Computing metrics
+Scoring 3190 queries in relish
+Computing metrics
+Computing metrics
+Computing metrics
+Wrote: results\relish\SimHash+hamming\run1\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.3944
+ndcg%20	0.5439
+----------Results for dev/unfaceted----------
+av_precision	0.3945
+ndcg%20	0.5519
+Wrote: results\relish\SimHash+hamming\run1\aggregated-evaluations.csv

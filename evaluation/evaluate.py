@@ -1,10 +1,14 @@
-import argparse
-import sys
 import logging
-from utils import *
+
+import pandas as pd
+
+from evaluation.metrics import compute_metrics
+from evaluation.utils import *
 import collections
 from tqdm import tqdm
 from typing import Union
+from evaluation.model import SimilarityModel
+
 
 def score(model: SimilarityModel,
           dataset: EvalDataset,
@@ -33,22 +37,28 @@ def score(model: SimilarityModel,
 
         # get query encoding
         # if faceted, also filter the encoding by facet
-        query_encoding = model.get_encoding(pids=[query_pid], dataset=dataset)[query_pid]
+        # query_encoding = model.get_encoding(pids=[query_pid], dataset=dataset)[query_pid]
         # if facet is not None:
         #     query_encoding = model.get_faceted_encoding(query_encoding, facet, dataset.get(query_pid))
+        query_content = dataset.get(query_pid)
+        query_encoding = query_content['TITLE'] + "".join(query_content['ABSTRACT'])
 
         # get candidates encoding
         candidate_pids = query_pool['cands']
-        candidate_encodings = model.get_encoding(pids=candidate_pids, dataset=dataset)
+        # candidate_encodings = model.get_encoding(pids=candidate_pids, dataset=dataset)
 
         # For calculate similarities of each candidate to query encoding
         candidate_similarities = dict()
         for candidate_pid in candidate_pids:
-            similarity = model.get_similarity(query_encoding, candidate_encodings[candidate_pid])
+            candidate_content = dataset.get(candidate_pid)
+            similarity = model.get_similarity(query_encoding, candidate_content['TITLE'] + "".join(candidate_content['ABSTRACT']))
             candidate_similarities[candidate_pid] = similarity
         # sort candidates by similarity, ascending (lower score == closer encodings)
+        # sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
+        # results[query_pid] = [(cpid, -1*sim) for cpid, sim in sorted_candidates]
+        # sort candidates by similarity, descending (higher score == closer encodings)
         sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
-        results[query_pid] = [(cpid, -1*sim) for cpid, sim in sorted_candidates]
+        results[query_pid] = [(cpid, sim) for cpid, sim in sorted_candidates]
 
     # write scores
     with codecs.open(scores_filename, 'w', 'utf-8') as fp:
@@ -63,11 +73,10 @@ def evaluate(results_dir: str,
     """
     Compute metrics based on a model's similarity scores on a dataset's test pool
     Assumes score() has already been called with relevant model_name, dataset and facet
-    :param results_dir:
-    :param model_name:
-    :param facet:
-    :param dataset:
-    :param comet_exp_key:
+    :param results_dir: Directory where scores are saved
+    :param facet: Facet of query to use. Relevant only to CSFcube dataset.
+    :param dataset: Dataset to take test pool from
+    :param comet_exp_key: Optional comet experiment key to log metrics to
     :return:
     """
     logging.info('Computing metrics')
@@ -112,7 +121,8 @@ def evaluate(results_dir: str,
     aggregated_metrics = []
     for facet_i in metrics.facet.unique():
         for split in metrics.split.unique():
-            agg_results = metrics[(metrics.facet == facet_i) & (metrics.split == split)][metric_columns].mean().round(4).to_dict()
+            agg_results = metrics[(metrics.facet == facet_i) & (metrics.split == split)][metric_columns].mean().round(
+                4).to_dict()
             logging.info(f'----------Results for {split}/{facet_i}----------')
             logging.info('\n'.join([f'{k}\t{agg_results[k]}' for k in ('av_precision', 'ndcg%20')]))
             agg_results['facet'] = facet_i
@@ -132,88 +142,3 @@ def evaluate(results_dir: str,
     aggregated_metrics_filename = get_evaluations_filename(results_dir, facet, aggregated=True)
     aggregated_metrics.to_csv(aggregated_metrics_filename, index=False)
     logging.info(f'Wrote: {aggregated_metrics_filename}')
-
-
-def main(args):
-    # init log
-    if args.log_fname is not None:
-        log_dir = os.path.split(os.path.join(os.getcwd(), args.log_fname))[0]
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-        logging.basicConfig(level='INFO', format='%(message)s', filename=args.log_fname)
-    else:
-        logging.basicConfig(level='INFO', format='%(message)s', stream=sys.stdout)
-
-    # check validity of command-line arguments
-    # check_args(args)
-
-    # init results dir
-    results_dir = get_results_dir(args.results_dir, args.dataset_name, args.model_name, args.run_name)
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-
-    # init model and dataset
-    dataset = EvalDataset(name=args.dataset_name, root_path=args.dataset_dir)
-    model = None
-    # if 'encode' in args.actions or 'score' in args.actions:
-    #     logging.info(f'Loading model: {args.model_name}')
-    #     model = get_model(model_name=args.model_name)
-    #     logging.info(f'Loading dataset: {args.dataset_name}')
-    #     if args.cache:
-    #         # init cache
-    #         encodings_filename = get_encodings_filename(results_dir)
-    #         logging.info(f'Setting model cache at: {encodings_filename}')
-    #         model.set_encodings_cache(encodings_filename)
-    #
-    # if 'encode' in args.actions:
-    #     # cache model's encodings of entire dataset
-    #     encode(model, dataset)
-
-    if 'score' in args.actions:
-        # score model on dataset's test pool
-        if args.facet == 'all':
-            for facet in FACETS:
-                score(model, dataset, facet=facet, scores_filename=get_scores_filename(results_dir, facet=facet))
-        else:
-            score(model, dataset, facet=args.facet, scores_filename=get_scores_filename(results_dir, facet=args.facet))
-
-    if 'evaluate' in args.actions:
-        # evaluate metrics for model scores
-        evaluate(results_dir,
-                 facet=args.facet,
-                 dataset=dataset)
-
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', required=True, help='The name of the model to run. Choose from a model_name '
-                                                            'with an implementation in evaluation_models.get_model')
-    parser.add_argument('--dataset_name', required=True, help='Dataset to evaluate similarities on',
-                        choices=['gorcmatscicit', 'csfcube', 'relish', 'treccovid',
-                                 'scidcite', 'scidcocite', 'scidcoread', 'scidcoview'])
-    parser.add_argument('--dataset_dir', required=True,
-                        help="Dir to dataset files (e.g. abstracts-{dataset}.jsonl)")
-    parser.add_argument('--results_dir', required=True,
-                        help="Results base dir to store encodings cache, scores and metrics")
-    # parser.add_argument('--facet', help='Relevant only to csfcube dataset. Select a facet to use for the task'
-    #                                     ' of faceted similarity search. If "all", tests all facets one at a time.',
-    #                     choices=['result', 'method', 'background', 'all'], default=None)
-    # parser.add_argument('--cache', action='store_true', help='Use if we would like to cache the encodings of papers.'
-    #                                                          'If action "encode" is selected, this is set automatically to true.')
-    parser.add_argument('--run_name', help='Name of this evaluation run.\n'
-                                           'Saves results under results_dir/model_name/run_name/\n'
-                                           'to allow different results to same model_name')
-    # parser.add_argument('--trained_model_path', help='Basename for a trained model we would like to evaluate on.')
-    parser.add_argument('--log_fname', help='Filename of log file')
-    parser.add_argument('--actions', choices=['encode', 'score', 'evaluate'],
-                        nargs="+", default=['encode', 'score', 'evaluate'],
-                        help="""'Encode' creates vector representations for the entire dataset.
-                        'Score' calculates similarity scores on the dataset's test pool.
-                        'Evaluate' calculates metrics based on the similarity scores predicted.
-                        By default does all three.""")
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
-    args = parse_args()
-    main(args)

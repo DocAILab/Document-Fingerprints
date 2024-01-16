@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from typing import Dict, Union
 
+
 class EvalDataset:
     """
     Class for datasets used in evaluation
@@ -61,7 +62,7 @@ class EvalDataset:
     def get(self, pid: str) -> Dict:
         """
         :param pid: paper id
-        :return: relevant information for the paper: title, abstract, and if available also facets and entities.
+        :return: relevant information for the paper: title(1), abstract(>=1), and if available also facets and entities. for
         """
         data = self.dataset[pid]
         # if self.ner_data is not None:
@@ -75,7 +76,7 @@ class EvalDataset:
         Load the test pool of queries and cadidates.
         If performing faceted search, the test pool depends on the facet.
         :param facet: If cfscube, one of (result, method, background). Else, None.
-        :return: test pool
+        :return: test pool, format: {"query_id": {"cands": [candidate_id1, candidate_id2, ...], "relevance_adju": [relevance_score1, relevance_score2, ...]}, ...}
         """
         if facet is not None:
             fname = os.path.join(self.root_path, f"test-pid2anns-{self.name}-{facet}.json")
@@ -110,14 +111,15 @@ class EvalDataset:
     def get_test_dev_split(self):
         """
         Load file that determines dev/test split for dataset.
-        :return:
+        :return: dictionary with keys being paper ids and values being 'dev' or 'test'
         """
         if self.name == 'csfcube':
             # entire dataset is test set
             return None
         else:
             with codecs.open(os.path.join(self.root_path, f'{self.name}-evaluation_splits.json'), 'r', 'utf-8') as f:
-                return json.load(f)
+                original_json = json.load(f)
+                return {value: key for key, values in original_json.items() for value in values}
 
     def get_threshold_grade(self):
         """
@@ -135,9 +137,7 @@ class EvalDataset:
 if __name__ == "__main__":
     # Example usage
     dataset = EvalDataset(name='relish', root_path='../datasets/RELISH')
-    print(dataset.get('29165708'))
-    print(dataset.get_test_pool())
-    print(dataset.get_gold_test_data())
-    print(dataset.get_query_metadata())
-    print(dataset.get_test_dev_split())
-    print(dataset.get_threshold_grade())
+    query_content = dataset.get('18672433')
+    print(f"query_content: {query_content}\n")
+    query_encoding = query_content['TITLE'] + "".join(query_content['ABSTRACT'])
+    print(f"query_encoding: {query_encoding}\n")

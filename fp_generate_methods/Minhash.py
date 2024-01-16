@@ -60,6 +60,8 @@ if __name__ == '__main__':
     minhash5 = generate_minhash(ngrams(str5, 1), num_perm)
 
     # 打印哈希值
+    a = minhash1.digest()
+    b = minhash1.hashvalues
     print(f"文件指纹1: {minhash1.digest()}")
     print(f"文件指纹2: {minhash2.digest()}")
     print(f"文件指纹3: {minhash3.digest()}")

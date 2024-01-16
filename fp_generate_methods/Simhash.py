@@ -1,5 +1,6 @@
 from simhash import Simhash, SimhashIndex
 
+
 def generate_simhash_fingerprint(text):
     simhash = Simhash(text)  # 默认指纹维度64，hash_func默认md5
     # 返回一个十六进制hash指纹
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     fingerprint1 = generate_simhash_fingerprint(str1)
     fingerprint2 = generate_simhash_fingerprint(str2)
     fingerprint3 = generate_simhash_fingerprint(str3)
-    print(f"文件指纹1: {bin(fingerprint1.value)}")
+    print(f"文件指纹1: {bin(fingerprint1.value)}")  # 不准确的二进制形式，可能会缺少前导0
     print(f"文件指纹2: {bin(fingerprint2.value)}")
     print(f"文件指纹3: {bin(fingerprint3.value)}")
 
