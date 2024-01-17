@@ -73,17 +73,17 @@ def fp_with_minhash(data, num_perm=128, n=3):
     :param data: 要生成指纹的数据，可以是字符串，也可以是集合
     :param num_perm: minhash维度，影响其精度，默认为128
     :param n: n-gram参数，默认为3
-    :return: minhash指纹，一个长度为num_perm的ndarray
+    :return: minhash指纹，一个长度为num_perm的list
     """
     if isinstance(data, str):
         ngrams = []
-        for i in range(len(text) - n + 1):
-            ngrams.append(text[i:i + n])
+        for i in range(len(data) - n + 1):
+            ngrams.append(data[i:i + n])
         data = set(ngrams)
     minhash = MinHash(num_perm=num_perm)
     for item in data:
         minhash.update(str(item).encode('utf8'))
-    return minhash.digest()
+    return minhash.digest().tolist()
 
 
 # Karp-Rabin
@@ -139,12 +139,11 @@ def fp_with_winnowing(text, n=5, w=5, hash_func=None):
     # 计算n-grams的哈希值列表
     hashes = []
     for ngram in ngrams:
-        # 也可以换其他hash
         if hash_func is None:
             hash_value = hashlib.sha1(ngram.encode('utf-8'))
             hash_value = hash_value.hexdigest()[-4:]
             hash_value = int(hash_value, 16)  # using last 16 bits of sha-1 digest
-        else:
+        else: # 也可以换其他hash
             hash_value = hash_func(ngram)
         hashes.append(hash_value)
     # 使用Winnowing算法从哈希列表中生成文本的指纹

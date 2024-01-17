@@ -1,3 +1,5 @@
+from collections import Counter
+
 from simhash import Simhash
 import hashlib
 
@@ -105,11 +107,22 @@ def calculate_jaccard_similarity(set1, set2):
     return similarity
 
 
+def multiset_jaccard_similarity(list1, list2):
+    counter1 = Counter(list1)
+    counter2 = Counter(list2)
+
+    intersection = sum((counter1 & counter2).values())
+    union = sum((counter1 | counter2).values())
+
+    similarity = intersection / union if union != 0 else 0.0
+    return similarity
+
+
 if __name__ == '__main__':
-    # str1 = 'This is a test text for similarity calculation using k-grams+Winnowing algorithm'
-    # str2 = 'This is a  calculation using k-grams+Winnowing algorithm and a little long'
-    str1 = '北京增值税电子普通发票.pdf'
-    str2 = '福建增值税电子普通发票.pdf'
+    str1 = 'This is a test text for similarity calculation using k-grams+Winnowing algorithm'
+    str2 = 'This is a  calculation using k-grams+Winnowing algorithm and a little long'
+    # str1 = '北京增值税电子普通发票.pdf'
+    # str2 = '福建增值税电子普通发票.pdf'
     str3 = '福建工程学院计算机学院培养方案.pdf'
 
     k = 2  # k值，根据实际情况设定
@@ -140,3 +153,11 @@ if __name__ == '__main__':
     print(f"jaccard相似度1和2: {similarity2_12}")
     print(f"jaccard相似度1和3: {similarity2_13}")
     print(f"jaccard相似度2和3: {similarity2_23}")
+
+    similarity3_12 = multiset_jaccard_similarity(set(fingerprint1), fingerprint2)
+    similarity3_13 = multiset_jaccard_similarity(set(fingerprint1), fingerprint3)
+    similarity3_23 = multiset_jaccard_similarity(set(fingerprint2), fingerprint3)
+
+    print(f"multiset jaccard相似度1和2: {similarity3_12}")
+    print(f"multiset jaccard相似度1和3: {similarity3_13}")
+    print(f"multiset jaccard相似度2和3: {similarity3_23}")

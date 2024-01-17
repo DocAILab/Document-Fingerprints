@@ -1,6 +1,8 @@
 """
 文档指纹的相似度计算算法集合
 """
+from collections import Counter
+
 import numpy as np
 from simhash import Simhash
 import Levenshtein
@@ -77,6 +79,23 @@ def jaccard_similarity(data1, data2):
         return intersection / union
     elif isinstance(data1, MinHash):
         return data1.jaccard(data2)  # 使用minhash估计的jaccard值
+
+def multiset_jaccard_similarity(data1, data2):
+    """
+    计算两个多重集合的jaccard相似度。
+    :param data1: 第一个数据，list
+    :param data2: 第二个数据，list
+    :return:
+    """
+    if isinstance(data1, list):
+        counter1 = Counter(data1)
+        counter2 = Counter(data2)
+        intersection = sum((counter1 & counter2).values())
+        union = sum((counter1 | counter2).values())
+        similarity = intersection / union
+        return similarity
+    else:
+        raise TypeError("input data must be in type of list")
 
 
 def levenshtein_distance(text1, text2, cal_simi=True):

@@ -9,7 +9,8 @@ class SimilarityModel:
         self.hash_name = hash_name
         self.similarity_name = similarity_name
 
-    def get_fp(self, text, method_name):
+    def get_fp(self, text):
+        method_name = self.hash_name
         if method_name == 'SimHash':
             if self.args.hash_func is not None:
                 return fp_with_simhash(text, self.args.hash_dim, self.args.hashfunc)
@@ -27,17 +28,17 @@ class SimilarityModel:
         else:
             raise ValueError('Invalid fingerprint method name: {}'.format(method_name))
 
-    def get_similarity(self, text1, text2):
-        fp1 = self.get_fp(text1, self.hash_name)
-        fp2 = self.get_fp(text2, self.hash_name)
+    def get_similarity(self, fp1, fp2):
         if self.similarity_name == 'hamming':
             return hamming_distance(fp1, fp2, cal_simi=True)
         elif self.similarity_name == 'jaccard':
             return jaccard_similarity(fp1, fp2)
+        elif self.similarity_name == 'multiset_jaccard':
+            return multiset_jaccard_similarity(fp1, fp2)
         elif self.similarity_name == 'levenshtein':
-            return levenshtein_distance(text1, text2, cal_simi=True)
+            return levenshtein_distance(fp1, fp2, cal_simi=True)
         elif self.similarity_name == 'wmd':
-            return wmd_distance(text1, text2)
+            return wmd_distance(fp1, fp2)
         elif self.similarity_name == 'cosine':
             return cosine_similarity(fp1, fp2)
         elif self.similarity_name == 'manhattan':
@@ -46,4 +47,3 @@ class SimilarityModel:
             return mahalanobis_distance(fp1, fp2, cal_simi=True)
         else:
             raise ValueError('Invalid similarity method name: {}'.format(self.similarity_name))
-

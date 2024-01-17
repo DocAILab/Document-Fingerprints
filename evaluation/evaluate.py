@@ -1,4 +1,5 @@
 import logging
+import time
 
 import pandas as pd
 
@@ -32,35 +33,67 @@ def score(model: SimilarityModel,
     logging.info(log_msg)
 
     # Get model similarity scores between each query and its candidates
+    start_time = time.time()
+    hashes = dict()
+    similarities = dict()
     results = collections.defaultdict(list)
     for query_pid, query_pool in tqdm(list(test_pool.items())):
-
-        # get query encoding
-        # if faceted, also filter the encoding by facet
+        # # get query encoding
+        # # if faceted, also filter the encoding by facet
         # query_encoding = model.get_encoding(pids=[query_pid], dataset=dataset)[query_pid]
         # if facet is not None:
         #     query_encoding = model.get_faceted_encoding(query_encoding, facet, dataset.get(query_pid))
-        query_content = dataset.get(query_pid)
-        query_encoding = query_content['TITLE'] + "".join(query_content['ABSTRACT'])
+        #
+        # # get candidates encoding
+        # candidate_pids = query_pool['cands']
+        # candidate_encodings = model.get_encoding(pids=candidate_pids, dataset=dataset)
+        #
+        # # For calculate similarities of each candidate to query encoding
+        # candidate_similarities = dict()
+        # for candidate_pid in candidate_pids:
+        #     similarity = model.get_similarity(query_encoding, candidate_encodings[candidate_pid])
+        #     candidate_similarities[candidate_pid] = similarity
+        # # sort candidates by similarity, ascending (lower score == closer encodings)
+        # sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
+        # results[query_pid] = [(cpid, -1 * sim) for cpid, sim in sorted_candidates]
+
+        # get query encoding
+        if query_pid not in hashes:
+            query_content = dataset.get(query_pid)
+            query_encoding = query_content['TITLE'] + "".join(query_content['ABSTRACT'])
+            query_fp = model.get_fp(query_encoding)
+            hashes[query_pid] = query_fp
+        else:
+            query_fp = hashes[query_pid]
 
         # get candidates encoding
         candidate_pids = query_pool['cands']
-        # candidate_encodings = model.get_encoding(pids=candidate_pids, dataset=dataset)
 
         # For calculate similarities of each candidate to query encoding
         candidate_similarities = dict()
         for candidate_pid in candidate_pids:
-            candidate_content = dataset.get(candidate_pid)
-            similarity = model.get_similarity(query_encoding, candidate_content['TITLE'] + "".join(candidate_content['ABSTRACT']))
+            if (query_pid, candidate_pid) in similarities:
+                similarity = similarities[(query_pid, candidate_pid)]
+            elif (candidate_pid, query_pid) in similarities:
+                similarity = similarities[(candidate_pid, query_pid)]
+            else:
+                if candidate_pid not in hashes:
+                    candidate_content = dataset.get(candidate_pid)
+                    candidate_encoding = candidate_content['TITLE'] + "".join(candidate_content['ABSTRACT'])
+                    candidate_fp = model.get_fp(candidate_encoding)
+                    hashes[candidate_pid] = candidate_fp
+                else:
+                    candidate_fp = hashes[candidate_pid]
+                similarity = model.get_similarity(query_fp, candidate_fp)
+                similarities[(query_pid, candidate_pid)] = similarity
             candidate_similarities[candidate_pid] = similarity
-        # sort candidates by similarity, ascending (lower score == closer encodings)
-        # sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
-        # results[query_pid] = [(cpid, -1*sim) for cpid, sim in sorted_candidates]
+
         # sort candidates by similarity, descending (higher score == closer encodings)
         sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
         results[query_pid] = [(cpid, sim) for cpid, sim in sorted_candidates]
 
     # write scores
+    logging.info(f'Finished scoring in {time.time() - start_time} seconds')
     with codecs.open(scores_filename, 'w', 'utf-8') as fp:
         json.dump(results, fp)
         logging.info(f'Wrote: {scores_filename}')
