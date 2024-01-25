@@ -1,0 +1,15 @@
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Finished scoring in 485.7003638744354 seconds
+Wrote: results\relish\Winnowing+multiset_jaccard\run1-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\Winnowing+multiset_jaccard\run1-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.5105
+ndcg%20	0.6815
+----------Results for dev/unfaceted----------
+av_precision	0.5185
+ndcg%20	0.6894
+Wrote: results\relish\Winnowing+multiset_jaccard\run1-classic_params\aggregated-evaluations.csv

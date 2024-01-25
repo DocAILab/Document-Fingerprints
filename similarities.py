@@ -1,8 +1,7 @@
 """
 文档指纹的相似度计算算法集合
 """
-from keras.preprocessing.text import Tokenizer
-
+# from keras.preprocessing.text import Tokenizer
 import numpy as np
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
@@ -221,20 +220,20 @@ def calculate_similarity(fingerprint1, fingerprint2, algorithm_type='cosine', te
             model = Word2Vec([tokens1, tokens2], vector_size=100, window=5, min_count=1, workers=4)
             vector1 = sum(model.wv[word] for word in tokens1) / len(tokens1)
             vector2 = sum(model.wv[word] for word in tokens2) / len(tokens2)
-        elif text_to_vector_method == 'onehot':
-            tokenizer = Tokenizer()
-            # todo: 优化模型的训练
-            tokenizer.fit_on_texts([fingerprint1, fingerprint2])
-            seq1 = tokenizer.texts_to_sequences([fingerprint1])[0]
-            seq2 = tokenizer.texts_to_sequences([fingerprint2])[0]
-            one_hot_encoding_seq1 = np.zeros((len(tokenizer.word_index) + 1,))
-            one_hot_encoding_seq2 = np.zeros((len(tokenizer.word_index) + 1,))
-            for index in seq1:
-                one_hot_encoding_seq1[index] = 1
-            for index in seq2:
-                one_hot_encoding_seq2[index] = 1
-            vector1 = one_hot_encoding_seq1
-            vector2 = one_hot_encoding_seq2
+        # elif text_to_vector_method == 'onehot':
+        #     tokenizer = Tokenizer()
+        #     # todo: 优化模型的训练
+        #     tokenizer.fit_on_texts([fingerprint1, fingerprint2])
+        #     seq1 = tokenizer.texts_to_sequences([fingerprint1])[0]
+        #     seq2 = tokenizer.texts_to_sequences([fingerprint2])[0]
+        #     one_hot_encoding_seq1 = np.zeros((len(tokenizer.word_index) + 1,))
+        #     one_hot_encoding_seq2 = np.zeros((len(tokenizer.word_index) + 1,))
+        #     for index in seq1:
+        #         one_hot_encoding_seq1[index] = 1
+        #     for index in seq2:
+        #         one_hot_encoding_seq2[index] = 1
+        #     vector1 = one_hot_encoding_seq1
+        #     vector2 = one_hot_encoding_seq2
         elif text_to_vector_method == 'pad':
             target_length = max(len(fingerprint1), len(fingerprint2))
             fingerprint1 = fingerprint1.ljust(target_length, '\0')
@@ -264,9 +263,9 @@ def calculate_similarity(fingerprint1, fingerprint2, algorithm_type='cosine', te
         return manhattan_similarity(vector1, vector2)
     elif algorithm_type == 'mahalanobis':
         return mahalanobis_distance(vector1, vector2)
-    elif algorithm_type == 'jaccard_similarity':
+    elif algorithm_type == 'jaccard':
         return jaccard_similarity(vector1, vector2)
-    elif algorithm_type == 'multiset_jaccard_similarity':
+    elif algorithm_type == 'multiset_jaccard':
         return multiset_jaccard_similarity(vector1, vector2)
     else:
         raise ValueError("Unsupported algorithm_type.")

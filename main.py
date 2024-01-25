@@ -89,10 +89,10 @@ def parse_args():
                                 By default does all three.""")
 
     # 各种哈希和相似度的选择及相关参数
-    parser.add_argument('--hash_name', default='Winnowing',
-                        choices=['SimHash', 'MinHash', 'Winnowing', 'FuzzyHashing', 'FlyHash'],
+    parser.add_argument('--hash_name', default='FuzzyHash',
+                        choices=['SimHash', 'MinHash', 'Winnowing', 'FuzzyHash', 'FlyHash'],
                         help='Hashing method')
-    parser.add_argument('--similarity_name', default='multiset_jaccard',
+    parser.add_argument('--similarity_name', default='levenshtein',
                         choices=['hamming', 'jaccard', 'multiset_jaccard', 'levenshtein', 'wmd', 'cosine', 'manhattan',
                                  'mahalanobis'],
                         help='Similarity method')
@@ -101,7 +101,9 @@ def parse_args():
                         help='Hash function or None for defaultHash')
     parser.add_argument('--ngram', type=int, default=5, help='Ngram分词大小')
     parser.add_argument('--winnowing_window', type=int, default=5, help='Winnowing窗口大小')
-
+    parser.add_argument('--text_to_vector_method', default=None,
+                        choices=['tfidf', 'word2vec', 'onehot', 'pad', 'truncate'],
+                        help='Text to vector method')
     return parser.parse_args()
 
 

@@ -1,0 +1,13 @@
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Finished scoring in 6.076682806015015 seconds
+Wrote: results\relish\FuzzyHash+levenshtein\run1-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\FuzzyHash+levenshtein\run1-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.4091
+ndcg%20	0.5632
+----------Results for dev/unfaceted----------
+av_precision	0.4119
+ndcg%20	0.5721
+Wrote: results\relish\FuzzyHash+levenshtein\run1-classic_params\aggregated-evaluations.csv

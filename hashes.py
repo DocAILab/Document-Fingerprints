@@ -70,7 +70,7 @@ def fp_with_simhash2(text, k=3, num_perm=64):
 def fp_with_minhash(data, num_perm=128, n=3):
     """
     使用MinHash生成集合数据指纹，并可结合jaccard_similarity函数估计计算jaccard值。
-    :param data: 要生成指纹的数据，可以是字符串，也可以是集合
+    :param data: 要生是字符串成指纹的数据，可以，也可以是集合
     :param num_perm: minhash维度，影响其精度，默认为128
     :param n: n-gram参数，默认为3
     :return: minhash指纹，一个长度为num_perm的list
