@@ -1,0 +1,12 @@
+Scoring 3190 queries in relish
+Finished scoring in 2415.9518280029297 seconds
+Wrote: results\relish\MinHash+hamming\run1-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\MinHash+hamming\run1-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.395
+ndcg%20	0.5534
+----------Results for dev/unfaceted----------
+av_precision	0.4005
+ndcg%20	0.567
+Wrote: results\relish\MinHash+hamming\run1-classic_params\aggregated-evaluations.csv

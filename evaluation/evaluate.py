@@ -38,55 +38,23 @@ def score(model: SimilarityModel,
     similarities = dict()
     results = collections.defaultdict(list)
     for query_pid, query_pool in tqdm(list(test_pool.items())):
-        # # get query encoding
-        # # if faceted, also filter the encoding by facet
-        # query_encoding = model.get_encoding(pids=[query_pid], dataset=dataset)[query_pid]
-        # if facet is not None:
-        #     query_encoding = model.get_faceted_encoding(query_encoding, facet, dataset.get(query_pid))
-        #
-        # # get candidates encoding
-        # candidate_pids = query_pool['cands']
-        # candidate_encodings = model.get_encoding(pids=candidate_pids, dataset=dataset)
-        #
-        # # For calculate similarities of each candidate to query encoding
-        # candidate_similarities = dict()
-        # for candidate_pid in candidate_pids:
-        #     similarity = model.get_similarity(query_encoding, candidate_encodings[candidate_pid])
-        #     candidate_similarities[candidate_pid] = similarity
-        # # sort candidates by similarity, ascending (lower score == closer encodings)
-        # sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
-        # results[query_pid] = [(cpid, -1 * sim) for cpid, sim in sorted_candidates]
-
-        # get query encoding
-        if query_pid not in hashes:
-            query_content = dataset.get(query_pid)
-            query_encoding = query_content['TITLE'] + "".join(query_content['ABSTRACT'])
-            query_fp = model.get_fp(query_encoding)
-            hashes[query_pid] = query_fp
+        if facet is None:
+            query_fp = model.get_fp(query_pid, dataset)
         else:
-            query_fp = hashes[query_pid]
+            query_fp = model.get_faced_fp(query_pid, dataset, facet)
 
-        # get candidates encoding
+        # get candidates fingerprints
         candidate_pids = query_pool['cands']
+        if facet is None:
+            candidate_fps = [model.get_fp(cpid, dataset) for cpid in candidate_pids]
+        else:
+            candidate_fps = [model.get_faced_fp(cpid, dataset, facet) for cpid in candidate_pids]
 
-        # For calculate similarities of each candidate to query encoding
+        # For calculate similarities of each candidate to query fingerprints
         candidate_similarities = dict()
-        for candidate_pid in candidate_pids:
-            if (query_pid, candidate_pid) in similarities:
-                similarity = similarities[(query_pid, candidate_pid)]
-            elif (candidate_pid, query_pid) in similarities:
-                similarity = similarities[(candidate_pid, query_pid)]
-            else:
-                if candidate_pid not in hashes:
-                    candidate_content = dataset.get(candidate_pid)
-                    candidate_encoding = candidate_content['TITLE'] + "".join(candidate_content['ABSTRACT'])
-                    candidate_fp = model.get_fp(candidate_encoding)
-                    hashes[candidate_pid] = candidate_fp
-                else:
-                    candidate_fp = hashes[candidate_pid]
-                similarity = model.get_similarity(query_fp, candidate_fp)
-                similarities[(query_pid, candidate_pid)] = similarity
-            candidate_similarities[candidate_pid] = similarity
+        for cpid in candidate_pids:
+            candidate_similarities[cpid] = model.get_similarity(query_fp, candidate_fps[
+                candidate_pids.index(cpid)])
 
         # sort candidates by similarity, descending (higher score == closer encodings)
         sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
@@ -129,6 +97,7 @@ def evaluate(results_dir: str,
     threshold_grade = dataset.get_threshold_grade()
 
     # compute metrics per query
+    start_time = time.time()
     metrics = []
     metric_columns = None
     for facet_i, facet_results in results.items():
@@ -171,6 +140,8 @@ def evaluate(results_dir: str,
             aggregated_metrics.append(agg_results)
     aggregated_metrics = pd.DataFrame(aggregated_metrics)
 
+    # write scores
+    logging.info(f'Finished evaluating in {time.time() - start_time} seconds')
     # Write evaluation file aggregated per (facet, dev/test_split)
     aggregated_metrics_filename = get_evaluations_filename(results_dir, facet, aggregated=True)
     aggregated_metrics.to_csv(aggregated_metrics_filename, index=False)

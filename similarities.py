@@ -31,8 +31,8 @@ from gensim.similarities import WmdSimilarity
 def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
     """
     计算两个指纹的汉明距离。
-    :param fingerprint1: 第一个指纹, 可以是Simhash, int或str
-    :param fingerprint2: 第二个指纹, 可以是Simhash, int或str（需保证两个指纹等长）
+    :param fingerprint1: 第一个指纹, 可以是Simhash, int, str或list
+    :param fingerprint2: 第二个指纹, 可以是Simhash, int, str或list（需保证两个指纹等长）
     :param cal_simi: 是否计算相似度
     :return: 汉明距离, [相似度]
     """
@@ -59,6 +59,15 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
         if len(fingerprint1) != len(fingerprint2):
             raise ValueError("input fingerprints in type of str must have same dimension!")
         hamming_dist = sum(bit1 != bit2 for bit1, bit2 in zip(list(fingerprint1), list(fingerprint2)))
+        if cal_simi:
+            dim = len(fingerprint1)
+            simi = 1 - (hamming_dist / dim)
+            return hamming_dist, simi
+        return hamming_dist
+    elif isinstance(fingerprint1, list):
+        if len(fingerprint1) != len(fingerprint2):
+            raise ValueError("input fingerprints in type of list must have same dimension!")
+        hamming_dist = sum(bit1 != bit2 for bit1, bit2 in zip(fingerprint1, fingerprint2))
         if cal_simi:
             dim = len(fingerprint1)
             simi = 1 - (hamming_dist / dim)
@@ -149,7 +158,7 @@ def wmd_similarity(text1, text2):
     tokens1 = word_tokenize(text1)
     tokens2 = word_tokenize(text2)
     model = Word2Vec([tokens1, tokens2], min_count=1)
-    similarity_index = WmdSimilarity([tokens1], model, num_best=1)
+    similarity_index = WmdSimilarity([tokens1], model, num_best=1) #TODO:报错了，似乎有什么问题
     similarity = similarity_index[tokens1][0][1]
     return similarity
 

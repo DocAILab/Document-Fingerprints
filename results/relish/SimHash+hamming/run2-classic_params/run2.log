@@ -1,0 +1,13 @@
+Scoring 3190 queries in relish
+Finished scoring in 402.7997043132782 seconds
+Wrote: results\relish\SimHash+hamming\run2-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\SimHash+hamming\run2-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.3843
+ndcg%20	0.5268
+----------Results for dev/unfaceted----------
+av_precision	0.3848
+ndcg%20	0.5364
+Finished evaluating in 2.215724229812622 seconds
+Wrote: results\relish\SimHash+hamming\run2-classic_params\aggregated-evaluations.csv

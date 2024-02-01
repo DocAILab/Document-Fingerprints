@@ -3,3 +3,5 @@ __pycache__/
 datasets/RELISH/
 !datasets/RELISH/statistic.py
 !datasets/RELISH/文件说明.txt
+datasets/CSFCube/
+!datasets/CSFCube/文件说明.txt

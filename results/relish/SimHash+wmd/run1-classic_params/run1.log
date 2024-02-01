@@ -1,0 +1,64 @@
+Creating C:\Users\admin/gensim-data
+caught non-fatal exception while trying to update gensim-data cache from 'https://raw.githubusercontent.com/RaRe-Technologies/gensim-data/master/list.json'; using local cache at 'C:\\Users\\admin/gensim-data\\information.json' instead
+Traceback (most recent call last):
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 1346, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 1279, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 1325, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 1274, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 1034, in _send_output
+    self.send(msg)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 974, in send
+    self.connect()
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\http\client.py", line 1448, in connect
+    self.sock = self._context.wrap_socket(self.sock,
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\ssl.py", line 500, in wrap_socket
+    return self.sslsocket_class._create(
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\ssl.py", line 1040, in _create
+    self.do_handshake()
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\ssl.py", line 1309, in do_handshake
+    self._sslobj.do_handshake()
+FileNotFoundError: [Errno 2] No such file or directory
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "F:\modelLightweight202306\MUSE\venv\lib\site-packages\gensim\downloader.py", line 199, in _load_info
+    info_bytes = urlopen(url).read()
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 517, in open
+    response = self._open(req, data)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 534, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 494, in _call_chain
+    result = func(*args)
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 1389, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python39\lib\urllib\request.py", line 1349, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 2] No such file or directory>
+Scoring 3190 queries in relish
+collecting all words and their counts
+PROGRESS: at sentence #0, processed 0 words, keeping 0 word types
+collected 2 word types from a corpus of 2 raw words and 2 sentences
+Creating a fresh vocabulary
+Word2Vec lifecycle event {'msg': 'effective_min_count=1 retains 2 unique words (100.00% of original 2, drops 0)', 'datetime': '2024-01-25T19:59:32.848126', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'prepare_vocab'}
+Word2Vec lifecycle event {'msg': 'effective_min_count=1 leaves 2 word corpus (100.00% of original 2, drops 0)', 'datetime': '2024-01-25T19:59:32.856152', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'prepare_vocab'}
+deleting the raw counts dictionary of 2 items
+sample=0.001 downsamples 2 most-common words
+Word2Vec lifecycle event {'msg': 'downsampling leaves estimated 0.09344271909999159 word corpus (4.7%% of prior 2)', 'datetime': '2024-01-25T19:59:32.860116', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'prepare_vocab'}
+estimated required memory for 2 words and 100 dimensions: 2600 bytes
+resetting layer weights
+Word2Vec lifecycle event {'update': False, 'trim_rule': 'None', 'datetime': '2024-01-25T19:59:32.864108', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'build_vocab'}
+Word2Vec lifecycle event {'msg': 'training model with 3 workers on 2 vocabulary and 100 features, using sg=0 hs=0 sample=0.001 negative=5 window=5 shrink_windows=True', 'datetime': '2024-01-25T19:59:32.864108', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'train'}
+EPOCH 0: training on 2 raw words (0 effective words) took 0.0s, 0 effective words/s
+EPOCH 1: training on 2 raw words (0 effective words) took 0.0s, 0 effective words/s
+EPOCH 2: training on 2 raw words (1 effective words) took 0.0s, 936 effective words/s
+EPOCH 3: training on 2 raw words (0 effective words) took 0.0s, 0 effective words/s
+EPOCH 4: training on 2 raw words (0 effective words) took 0.0s, 0 effective words/s
+Word2Vec lifecycle event {'msg': 'training on 10 raw words (1 effective words) took 0.0s, 75 effective words/s', 'datetime': '2024-01-25T19:59:32.876091', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'train'}
+Word2Vec lifecycle event {'params': 'Word2Vec<vocab=2, vector_size=100, alpha=0.025>', 'datetime': '2024-01-25T19:59:32.876091', 'gensim': '4.3.2', 'python': '3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19045-SP0', 'event': 'created'}

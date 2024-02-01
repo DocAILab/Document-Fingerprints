@@ -1,0 +1,37 @@
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Scoring 16 queries in csfcube, facet: background
+Finished scoring in 1.3511905670166016 seconds
+Wrote: results\csfcube\Winnowing+multiset_jaccard\run1-classic_params\scores-background.json
+Scoring 17 queries in csfcube, facet: method
+Finished scoring in 1.264021873474121 seconds
+Wrote: results\csfcube\Winnowing+multiset_jaccard\run1-classic_params\scores-method.json
+Scoring 17 queries in csfcube, facet: result
+Finished scoring in 0.53196120262146 seconds
+Wrote: results\csfcube\Winnowing+multiset_jaccard\run1-classic_params\scores-result.json
+Computing metrics
+Wrote: results\csfcube\Winnowing+multiset_jaccard\run1-classic_params\query-evaluations-all.csv
+----------Results for test/background----------
+av_precision	0.4073
+ndcg%20	0.6204
+----------Results for test/method----------
+av_precision	0.156
+ndcg%20	0.3306
+----------Results for test/result----------
+av_precision	0.2308
+ndcg%20	0.437
+----------Results for test/all----------
+av_precision	0.2618
+ndcg%20	0.4595
+Finished evaluating in 0.060395002365112305 seconds
+Wrote: results\csfcube\Winnowing+multiset_jaccard\run1-classic_params\aggregated-evaluations-all.csv

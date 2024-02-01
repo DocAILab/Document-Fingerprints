@@ -1,0 +1,25 @@
+Scoring 16 queries in csfcube, facet: background
+Finished scoring in 0.05670356750488281 seconds
+Wrote: results\csfcube\FuzzyHash+levenshtein\run1-classic_params\scores-background.json
+Scoring 17 queries in csfcube, facet: method
+Finished scoring in 0.044870615005493164 seconds
+Wrote: results\csfcube\FuzzyHash+levenshtein\run1-classic_params\scores-method.json
+Scoring 17 queries in csfcube, facet: result
+Finished scoring in 0.025931358337402344 seconds
+Wrote: results\csfcube\FuzzyHash+levenshtein\run1-classic_params\scores-result.json
+Computing metrics
+Wrote: results\csfcube\FuzzyHash+levenshtein\run1-classic_params\query-evaluations-all.csv
+----------Results for test/background----------
+av_precision	0.1384
+ndcg%20	0.2506
+----------Results for test/method----------
+av_precision	0.1154
+ndcg%20	0.1956
+----------Results for test/result----------
+av_precision	0.1065
+ndcg%20	0.2139
+----------Results for test/all----------
+av_precision	0.1197
+ndcg%20	0.2194
+Finished evaluating in 0.05842781066894531 seconds
+Wrote: results\csfcube\FuzzyHash+levenshtein\run1-classic_params\aggregated-evaluations-all.csv

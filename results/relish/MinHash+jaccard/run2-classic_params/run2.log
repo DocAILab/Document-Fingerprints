@@ -1,0 +1,13 @@
+Scoring 3190 queries in relish
+Finished scoring in 65843.54572892189 seconds
+Wrote: results\relish\MinHash+jaccard\run2-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\MinHash+jaccard\run2-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.457
+ndcg%20	0.6206
+----------Results for dev/unfaceted----------
+av_precision	0.4575
+ndcg%20	0.6278
+Finished evaluating in 2.2279913425445557 seconds
+Wrote: results\relish\MinHash+jaccard\run2-classic_params\aggregated-evaluations.csv

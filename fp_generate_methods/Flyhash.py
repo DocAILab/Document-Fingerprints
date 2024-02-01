@@ -30,11 +30,13 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
     raw_answer = flyHash(tfidf_matrix.toarray())
     # 按照论文还有一个把高维度hash结果缩减到低维结果的步骤，此包中没有，在下方添加：
     answer = []
+    if raw_answer.ndim == 1:
+        raw_answer = [raw_answer]
     for sublist in raw_answer:
         # 缩减成1/k长度。每k个相加，如果大于0，则结果为1否则为0。存成01字符串
         sub_answer = [1 if (sum(sublist[i * k:i * k + k - 1]) > 0) else 0 for i in range(hash_dim)]
         answer.append("".join(map(str, sub_answer)))
-    return answer
+    return str(answer)
 
 
 def fp_with_flyhash2(data, hash_dim, k=20, density=0.1, sparsity=0.05):

@@ -67,7 +67,7 @@ def parse_args():
                         choices=['gorcmatscicit', 'csfcube', 'relish', 'treccovid',
                                  'scidcite', 'scidcocite', 'scidcoread', 'scidcoview'], default='relish')
     parser.add_argument('--dataset_dir',
-                        help="Dir to dataset files (e.g. abstracts-{dataset}.jsonl)", default='datasets/RELISH')
+                        help="Dir to dataset files (e.g. abstracts-{dataset}.jsonl)", default='datasets/Relish')
     parser.add_argument('--results_dir',
                         help="Results base dir to store encodings cache, scores and metrics", default='results')
     parser.add_argument('--facet', choices=['result', 'method', 'background', 'all'], default=None,
@@ -79,9 +79,9 @@ def parse_args():
     parser.add_argument('--run_name', help='Name of this evaluation run.\n'
                                            'Saves results under results_dir/hash_name+similarity_name/run_name/\n'
                                            'to allow different results to same model_name',
-                        default='run1-classic_params')
+                        default='run2-classic_params')
     # parser.add_argument('--trained_model_path', help='Basename for a trained model we would like to evaluate on.')
-    parser.add_argument('--log_fname', help='Filename of log file', default="run1" + '.log')
+    parser.add_argument('--log_fname', help='Filename of log file', default="run2" + '.log')
     parser.add_argument('--actions', choices=['score', 'evaluate'], nargs="+", default=['score', 'evaluate'],
                         help="""'Encode' creates vector representations for the entire dataset.
                                 'Score' calculates similarity scores on the dataset's test pool.
@@ -89,10 +89,10 @@ def parse_args():
                                 By default does all three.""")
 
     # 各种哈希和相似度的选择及相关参数
-    parser.add_argument('--hash_name', default='FuzzyHash',
+    parser.add_argument('--hash_name', default='Winnowing',
                         choices=['SimHash', 'MinHash', 'Winnowing', 'FuzzyHash', 'FlyHash'],
                         help='Hashing method')
-    parser.add_argument('--similarity_name', default='levenshtein',
+    parser.add_argument('--similarity_name', default='multiset_jaccard',
                         choices=['hamming', 'jaccard', 'multiset_jaccard', 'levenshtein', 'wmd', 'cosine', 'manhattan',
                                  'mahalanobis'],
                         help='Similarity method')
@@ -103,7 +103,7 @@ def parse_args():
     parser.add_argument('--winnowing_window', type=int, default=5, help='Winnowing窗口大小')
     parser.add_argument('--text_to_vector_method', default=None,
                         choices=['tfidf', 'word2vec', 'onehot', 'pad', 'truncate'],
-                        help='Text to vector method')
+                        help='Text to vector method for similarity calculation')
     return parser.parse_args()
 
 

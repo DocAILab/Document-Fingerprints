@@ -1,0 +1,12 @@
+Scoring 3190 queries in relish
+Finished scoring in 493.4048912525177 seconds
+Wrote: results\relish\SimHash+cosine\run1-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\SimHash+cosine\run1-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.4578
+ndcg%20	0.62
+----------Results for dev/unfaceted----------
+av_precision	0.4596
+ndcg%20	0.6258
+Wrote: results\relish\SimHash+cosine\run1-classic_params\aggregated-evaluations.csv

@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 # Simhash
-def fp_with_simhash(text, f=64, hash_func=None): # TODO：探究分词对simhash的影响
+def fp_with_simhash(text, f=64, hash_func=None):  # TODO：探究分词对simhash的影响
     """
     使用Simhash库生成文本指纹。
     :param text: 文本
@@ -143,7 +143,7 @@ def fp_with_winnowing(text, n=5, w=5, hash_func=None):
             hash_value = hashlib.sha1(ngram.encode('utf-8'))
             hash_value = hash_value.hexdigest()[-4:]
             hash_value = int(hash_value, 16)  # using last 16 bits of sha-1 digest
-        else: # 也可以换其他hash
+        else:  # 也可以换其他hash
             hash_value = hash_func(ngram)
         hashes.append(hash_value)
     # 使用Winnowing算法从哈希列表中生成文本的指纹
@@ -151,6 +151,7 @@ def fp_with_winnowing(text, n=5, w=5, hash_func=None):
 
     # 找到初始窗口中的最小哈希值(若有重复选最右边)
     min_pos, min_hash = 0, hashes[0]
+
     for i, x in enumerate(hashes[0:w]):
         if x <= min_hash:
             min_pos, min_hash = i, x
@@ -202,6 +203,7 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         :param tokenizer: 分词函数，如果是中文需要自定义分词函数，否则使用默认的分词函数
         :return: 稀疏哈希嵌入结果，01字符串
     """
+
     def chinese_tokenizer(text):
         """
         中文分词函数，使用jieba分词
@@ -209,6 +211,7 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         :return: 分词结果
         """
         return jieba.lcut(text)
+
     if tokenizer == "chinese":
         tokenizer = chinese_tokenizer
     # TF-IDF矩阵的每一行对应于一个文档，而每一列对应于一个单词
@@ -219,11 +222,13 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
     raw_answer = flyHash(tfidf_matrix.toarray())
     # 按照论文还有一个把高维度hash结果缩减到低维结果的步骤，此包中没有，在下方添加：
     answer = []
+    if raw_answer.ndim == 1:
+        raw_answer = [raw_answer]
     for sublist in raw_answer:
         # 缩减成1/k长度。每k个相加，如果大于0，则结果为1否则为0。存成01字符串
         sub_answer = [1 if (sum(sublist[i * k:i * k + k - 1]) > 0) else 0 for i in range(hash_dim)]
         answer.append("".join(map(str, sub_answer)))
-    return answer
+    return str(answer)
 
 
 if __name__ == "__main__":

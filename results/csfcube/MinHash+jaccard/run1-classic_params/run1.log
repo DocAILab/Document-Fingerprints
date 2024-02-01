@@ -1,0 +1,26 @@
+Scoring 16 queries in csfcube, facet: background
+Finished scoring in 7.952874183654785 seconds
+Wrote: results\csfcube\MinHash+jaccard\run1-classic_params\scores-background.json
+Scoring 17 queries in csfcube, facet: method
+Finished scoring in 6.497877597808838 seconds
+Wrote: results\csfcube\MinHash+jaccard\run1-classic_params\scores-method.json
+Scoring 17 queries in csfcube, facet: result
+Finished scoring in 2.601715564727783 seconds
+Wrote: results\csfcube\MinHash+jaccard\run1-classic_params\scores-result.json
+Computing metrics
+Computing metrics
+Wrote: results\csfcube\MinHash+jaccard\run1-classic_params\query-evaluations-all.csv
+----------Results for test/background----------
+av_precision	0.347
+ndcg%20	0.5383
+----------Results for test/method----------
+av_precision	0.1659
+ndcg%20	0.3269
+----------Results for test/result----------
+av_precision	0.2259
+ndcg%20	0.4016
+----------Results for test/all----------
+av_precision	0.2443
+ndcg%20	0.42
+Finished evaluating in 0.05681633949279785 seconds
+Wrote: results\csfcube\MinHash+jaccard\run1-classic_params\aggregated-evaluations-all.csv

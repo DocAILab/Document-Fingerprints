@@ -1,0 +1,19 @@
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Scoring 3190 queries in relish
+Finished scoring in 777.9656643867493 seconds
+Wrote: results\relish\FlyHash+cosine\run1-classic_params\scores.json
+Computing metrics
+Wrote: results\relish\FlyHash+cosine\run1-classic_params\query-evaluations.csv
+----------Results for test/unfaceted----------
+av_precision	0.4002
+ndcg%20	0.5506
+----------Results for dev/unfaceted----------
+av_precision	0.4036
+ndcg%20	0.5613
+Wrote: results\relish\FlyHash+cosine\run1-classic_params\aggregated-evaluations.csv

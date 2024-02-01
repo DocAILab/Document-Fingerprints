@@ -1,0 +1,25 @@
+Scoring 16 queries in csfcube, facet: background
+Finished scoring in 1.5225059986114502 seconds
+Wrote: results\csfcube\SimHash+hamming\run1-classic_params\scores-background.json
+Scoring 17 queries in csfcube, facet: method
+Finished scoring in 1.2020697593688965 seconds
+Wrote: results\csfcube\SimHash+hamming\run1-classic_params\scores-method.json
+Scoring 17 queries in csfcube, facet: result
+Finished scoring in 0.4364790916442871 seconds
+Wrote: results\csfcube\SimHash+hamming\run1-classic_params\scores-result.json
+Computing metrics
+Wrote: results\csfcube\SimHash+hamming\run1-classic_params\query-evaluations-all.csv
+----------Results for test/background----------
+av_precision	0.1097
+ndcg%20	0.1654
+----------Results for test/method----------
+av_precision	0.0823
+ndcg%20	0.1327
+----------Results for test/result----------
+av_precision	0.099
+ndcg%20	0.1603
+----------Results for test/all----------
+av_precision	0.0968
+ndcg%20	0.1525
+Finished evaluating in 0.051434993743896484 seconds
+Wrote: results\csfcube\SimHash+hamming\run1-classic_params\aggregated-evaluations-all.csv
