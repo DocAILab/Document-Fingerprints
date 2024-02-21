@@ -1,30 +1,40 @@
 from sentence_transformers import SentenceTransformer
 from FlagEmbedding import FlagModel
 from text2vec import SentenceModel
+import torch
+
+
+def binary_encoding(input_vector):
+    input_tensor = torch.tensor(input_vector)
+    threshold = torch.median(input_tensor)
+    binary_vector = (input_tensor > threshold).type(torch.FloatTensor)
+    return binary_vector
+
 
 def get_MokaAI_embedding(text, model_name='moka-ai/m3e-base'):
     model = SentenceTransformer(model_name)
     embedding = model.encode([text])
-    return embedding[0]
+    return binary_encoding(embedding[0])
 
 
-def get_BAAI_embedding(text, model_name='BAAI/bge-large-zh-v1.5'):
+def get_BAAI_embedding(text, model_name='BAAI/bge-small-en-v1.5'):
     model = FlagModel(model_name)
     embedding = model.encode([text])
-    return embedding[0]
+    return binary_encoding(embedding[0])
 
 
 def get_text2vec_embedding(text, model_name):
     model = SentenceModel(model_name)
     embedding = model.encode([text])
-    return embedding[0]
+    return binary_encoding(embedding[0])
 
 def get_sentence_embedding(embedding_model, text):
     moka_ai_models = ['moka-ai/m3e-base', 'moka-ai/m3e-small', 'moka-ai/m3e-large']
 
     baai_models = ['BAAI/bge-small-zh', 'BAAI/bge-base-zh', 'BAAI/bge-large-zh',
                    'BAAI/bge-small-zh-v1.5', 'BAAI/bge-base-zh-v1.5', 'BAAI/bge-large-zh-v1.5',
-                   'BAAI/bge-large-zh-noinstruct', 'BAAI/bge-reranker-large', 'BAAI/bge-reranker-base']
+                   'BAAI/bge-large-zh-noinstruct', 'BAAI/bge-reranker-large', 'BAAI/bge-reranker-base',
+                   'BAAI/bge-small-en-v1.5']
 
     text2vec_models = ['shibing624/text2vec-base-chinese-sentence', 'shibing624/text2vec-base-chinese-paraphrase',
                        'shibing624/text2vec-base-multilingual', 'shibing624/text2vec-base-chinese',
@@ -44,4 +54,4 @@ def get_sentence_embedding(embedding_model, text):
 if __name__ == "__main__":
     sentence1 = "Your sentence here."
 
-    print(get_sentence_embedding('shibing624/text2vec-base-chinese-sentence', sentence1))
+    print(get_sentence_embedding('BAAI/bge-small-en-v1.5', sentence1))
