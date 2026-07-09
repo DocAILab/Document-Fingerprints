@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# 设置变量，用于存储命令行参数
-dataset_name="relish"
-dataset_dir="./datasets/RELISH"
+dataset_name="csfcube"
+dataset_dir="./datasets/CSFCube-H3D"
 results_dir="./results"
+run_name="smoke_minhash_jaccard"
 
-
-# 调用 Python 脚本并传递参数
-python main.py --dataset_name "$dataset_name" --dataset_dir "$dataset_dir" --results_dir "$results_dir" \
---hash_name FuzzyHash --similarity_name jaccard
+python main.py \
+  --dataset_name "$dataset_name" \
+  --dataset_dir "$dataset_dir" \
+  --results_dir "$results_dir" \
+  --facet all \
+  --hash_name MinHash \
+  --similarity_name jaccard \
+  --hash_dim 16 \
+  --ngram 3 \
+  --run_name "$run_name"

@@ -4,16 +4,27 @@
 # from keras.preprocessing.text import Tokenizer
 import numpy as np
 # from gensim.models import Word2Vec
-from nltk.tokenize import word_tokenize
-from simhash import Simhash
-import Levenshtein
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from datasketch import MinHash
 from utils import remove_stopwords
 # import gensim.downloader as api
 from scipy.spatial import distance
 from collections import Counter
+
+try:
+    from simhash import Simhash
+except ImportError:
+    Simhash = None
+
+try:
+    from datasketch import MinHash
+except ImportError:
+    MinHash = None
+
+
+def _missing_dependency(package, feature):
+    raise ImportError(
+        f"{feature} requires the optional dependency '{package}'. "
+        "Install the dependencies from requirements.txt or choose another method."
+    )
 
 # from gensim.similarities import WmdSimilarity
 
@@ -48,7 +59,7 @@ def hamming_distance(fingerprint1, fingerprint2, cal_simi=True):
     :param cal_simi: 是否计算相似度
     :return: 汉明距离, [相似度]
     """
-    if isinstance(fingerprint1, Simhash):
+    if Simhash is not None and isinstance(fingerprint1, Simhash):
         hamming_dist = fingerprint1.distance(fingerprint2)
         if cal_simi:
             if fingerprint1.f != fingerprint2.f:
@@ -103,6 +114,10 @@ def levenshtein_distance(text1, text2, cal_simi=True):
     :param cal_simi: 是否计算相似度
     :return: 编辑距离, [相似度]
     """
+    try:
+        import Levenshtein
+    except ImportError:
+        _missing_dependency("python-Levenshtein", "Levenshtein similarity")
     if isinstance(text1, (list, np.ndarray)) and isinstance(text2, (list, np.ndarray)):
         # 将数值序列编码为定长 token 串后再计算编辑距离，避免与位置错配计数完全等价。
         seq1 = "|".join(f"{int(v) & 0xffffffff:08x}" for v in text1)
@@ -135,7 +150,7 @@ def jaccard_similarity(data1, data2):
         intersection = len(data1.intersection(data2))
         union = len(data1.union(data2))
         return intersection / union
-    elif isinstance(data1, MinHash):
+    elif MinHash is not None and isinstance(data1, MinHash):
         return data1.jaccard(data2)  # 使用minhash估计的jaccard值
     elif isinstance(data1, str):
         data1 = set(list(data1))
@@ -193,6 +208,15 @@ def wmd_similarity(text1, text2):
         :param text2: 第二个文本，str
         :return: wmd相似度，float
     """
+    try:
+        from nltk.tokenize import word_tokenize
+    except ImportError:
+        _missing_dependency("nltk", "WMD similarity")
+    try:
+        from gensim.models import Word2Vec
+        from gensim.similarities import WmdSimilarity
+    except ImportError:
+        _missing_dependency("gensim", "WMD similarity")
     tokens1 = word_tokenize(text1)
     tokens2 = word_tokenize(text2)
     model = Word2Vec([tokens1, tokens2], min_count=1)
@@ -210,6 +234,10 @@ def cos_similarity(vector1, vector2):
     Returns:
     - cos相似度
     """
+    try:
+        from sklearn.metrics.pairwise import cosine_similarity
+    except ImportError:
+        _missing_dependency("scikit-learn", "cosine similarity")
     if isinstance(vector1, np.ndarray):
         cosine_sim = cosine_similarity(vector1.reshape(1, -1), vector2.reshape(1, -1))[0][0]
     elif isinstance(vector1, list):
@@ -295,12 +323,21 @@ def calculate_similarity(fingerprint1, fingerprint2, algorithm_type='cosine', te
         vector1 = fingerprint1
         vector2 = fingerprint2
         if text_to_vector_method == 'tfidf':
+            try:
+                from sklearn.feature_extraction.text import TfidfVectorizer
+            except ImportError:
+                _missing_dependency("scikit-learn", "TF-IDF vectorization")
             vectorized = TfidfVectorizer(use_idf=True, norm='l2')
             # todo: 优化模型的训练
             tfidf_matrix = vectorized.fit_transform([fingerprint1, fingerprint2])
             vector1 = tfidf_matrix[0].toarray().flatten()
             vector2 = tfidf_matrix[1].toarray().flatten()
         elif text_to_vector_method == 'word2vec':
+            try:
+                from nltk.tokenize import word_tokenize
+                from gensim.models import Word2Vec
+            except ImportError as exc:
+                _missing_dependency(exc.name or "nltk/gensim", "Word2Vec vectorization")
             tokens1 = word_tokenize(fingerprint1.lower())
             tokens2 = word_tokenize(fingerprint2.lower())
             # todo: 优化模型的训练

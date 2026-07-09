@@ -77,18 +77,19 @@ def parse_args():
             "gorcmatscicit",
             "csfcube",
             "relish",
+            "dbpedia",
             "treccovid",
             "scidcite",
             "scidcocite",
             "scidcoread",
             "scidcoview",
         ],
-        default="relish",
+        default="csfcube",
     )
     parser.add_argument(
         "--dataset_dir",
         help="Directory containing dataset files.",
-        default="datasets/RELISH-H3D",
+        default="datasets/CSFCube-H3D",
     )
     parser.add_argument(
         "--results_dir",
@@ -98,7 +99,7 @@ def parse_args():
     parser.add_argument(
         "--facet",
         choices=["result", "method", "background", "all", None],
-        default=None,
+        default="all",
         help="CSFCube facet to evaluate. Use 'all' to evaluate all facets.",
     )
     parser.add_argument("--log_fname", help="Log filename.", default="run.log")

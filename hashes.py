@@ -2,15 +2,14 @@
 生成文档指纹的哈希算法集合
 """
 import hashlib
-import Levenshtein
-import jieba
-from simhash import Simhash
-from nltk import ngrams
-from datasketch import MinHash
-import pyssdeep
 import numpy as np
-from flyhash import FlyHash
-from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+def _missing_dependency(package, feature):
+    raise ImportError(
+        f"{feature} requires the optional dependency '{package}'. "
+        "Install the dependencies from requirements.txt or choose another method."
+    )
 
 
 # Simhash
@@ -24,6 +23,10 @@ def fp_with_simhash(text, f=64, hash_func=None):  # TODO：探究分词对simhas
     """
     # 替换hash_func
     # hash_func = hashlib.md5
+    try:
+        from simhash import Simhash
+    except ImportError:
+        _missing_dependency("simhash", "SimHash")
     if hash_func is not None:
         simhash = Simhash(text, f, hash_func)
     else:
@@ -42,6 +45,10 @@ def fp_with_simhash2(text, k=3, num_perm=64):
     :param num_perm: Simhash的排列数，也即最后指纹的二进制维度
     :return: simhash指纹，01字符串的形式
     """
+    try:
+        from nltk import ngrams
+    except ImportError:
+        _missing_dependency("nltk", "SimHash n-gram mode")
     # 初始化特征向量
     feature_vector = [0] * num_perm
 
@@ -75,6 +82,10 @@ def fp_with_minhash(data, num_perm=128, n=3):
     :param n: n-gram参数，默认为3
     :return: minhash指纹，一个长度为num_perm的list
     """
+    try:
+        from datasketch import MinHash
+    except ImportError:
+        _missing_dependency("datasketch", "MinHash")
     if isinstance(data, str):
         ngrams = []
         for i in range(len(data) - n + 1):
@@ -186,6 +197,10 @@ def fp_with_fuzzyhash(data, is_path=False):
     :param is_path: 是否是文件路径
     :return: 文档指纹，str(ascii码串的形式，每一位ascii码代表一个分片的结果)
     """
+    try:
+        import pyssdeep
+    except ImportError:
+        _missing_dependency("pyssdeep", "FuzzyHash")
     if is_path:
         return pyssdeep.get_hash_file(data)
     return pyssdeep.get_hash_buffer(data)
@@ -206,6 +221,12 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         :param tokenizer: 分词函数，如果是中文需要自定义分词函数，否则使用默认的分词函数
         :return: 稀疏哈希嵌入结果，01字符串
     """
+    try:
+        import jieba
+        from flyhash import FlyHash
+        from sklearn.feature_extraction.text import TfidfVectorizer
+    except ImportError as exc:
+        _missing_dependency(exc.name or "flyhash/sklearn/jieba", "FlyHash")
 
     def chinese_tokenizer(text):
         """

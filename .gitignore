@@ -19,6 +19,7 @@ Thumbs.db
 
 # Generated outputs
 results/
+smoke_results/
 logs/
 *.log
 similarities.csv

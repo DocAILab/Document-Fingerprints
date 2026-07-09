@@ -76,7 +76,7 @@ The default BGE model argument is `BAAI/bge-base-en-v1.5`. You can also pass a l
 
 ## Data
 
-This repository keeps lightweight metadata, annotations, conversion scripts, and dataset documentation. Some full text or generated files are too large for a normal GitHub code repository and are ignored by git. Recreate them from the original sources with the conversion scripts in each dataset folder.
+This repository keeps lightweight metadata, annotations, conversion scripts, and dataset documentation. `CSFCube-H3D` includes the processed files needed by the quick-start commands below. Some full text or generated files for the larger datasets are too large for a normal GitHub code repository and are ignored by git. Recreate those files from the original sources with the conversion scripts in each dataset folder.
 
 Each dataset folder has its own `README.md` with source, license, citation, processing, and file-format notes.
 
@@ -104,25 +104,27 @@ The H3D/BIGAE-style generated files use:
 
 ## Quick Start
 
-Run MinHash on RELISH:
+Run a small CSFCube-H3D smoke test with MinHash:
 
 ```bash
 python main.py \
-  --dataset_name relish \
-  --dataset_dir datasets/RELISH-H3D \
+  --dataset_name csfcube \
+  --dataset_dir datasets/CSFCube-H3D \
+  --facet all \
   --hash_name MinHash \
   --similarity_name jaccard \
-  --hash_dim 128 \
+  --hash_dim 16 \
   --ngram 3 \
-  --run_name minhash_jaccard
+  --run_name smoke_minhash_jaccard
 ```
 
-Run SimHash with Hamming similarity:
+Run SimHash with Hamming similarity on CSFCube-H3D:
 
 ```bash
 python main.py \
-  --dataset_name relish \
-  --dataset_dir datasets/RELISH-H3D \
+  --dataset_name csfcube \
+  --dataset_dir datasets/CSFCube-H3D \
+  --facet all \
   --hash_name SimHash \
   --similarity_name hamming \
   --hash_dim 128 \
@@ -161,20 +163,23 @@ To recompute metrics from existing scores without rescoring:
 
 ```bash
 python main.py \
-  --dataset_name relish \
-  --dataset_dir datasets/RELISH-H3D \
+  --dataset_name csfcube \
+  --dataset_dir datasets/CSFCube-H3D \
+  --facet all \
   --hash_name MinHash \
   --similarity_name jaccard \
-  --run_name minhash_jaccard \
+  --run_name smoke_minhash_jaccard \
   --actions evaluate
 ```
+
+RELISH-H3D and DBpedia-H3D can be evaluated with the same CLI after their generated H3D JSON files have been recreated from the original data sources. See each dataset `README.md` for the source, license, citation, and conversion notes.
 
 ## CLI Arguments
 
 | Argument | Description |
 | --- | --- |
-| `--dataset_name` | Dataset key used for file names, usually `relish` or `csfcube`. |
-| `--dataset_dir` | Dataset directory, such as `datasets/RELISH-H3D`. |
+| `--dataset_name` | Dataset key used for file names, usually `csfcube`, `relish`, or `dbpedia`. |
+| `--dataset_dir` | Dataset directory, such as `datasets/CSFCube-H3D`. |
 | `--results_dir` | Output base directory. Default: `results`. |
 | `--facet` | CSFCube facet: `background`, `method`, `result`, or `all`. |
 | `--actions` | Run `score`, `evaluate`, or both. |
