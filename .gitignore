@@ -1,7 +1,46 @@
-.idea/
+# Python
 __pycache__/
-datasets/RELISH/
-!datasets/RELISH/statistic.py
-!datasets/RELISH/文件说明.txt
-datasets/CSFCube/
-!datasets/CSFCube/文件说明.txt
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Local environments
+.venv/
+venv/
+env/
+document_fingerprint_env/
+
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Generated outputs
+results/
+logs/
+*.log
+similarities.csv
+
+# Local model checkpoints and vendored third-party repositories
+FlagEmbedding/
+models/
+checkpoints/
+*.bin
+*.pt
+*.pth
+*.safetensors
+
+# Large generated dataset artifacts. Recreate them with dataset conversion scripts.
+datasets/RELISH-H3D/abstracts-relish.jsonl
+datasets/RELISH-H3D/relish_train.0.json
+datasets/RELISH-H3D/hash_results.json
+datasets/RELISH-H3D/hash_result_all.json
+datasets/DBpedia-H3D/dbpedia_train.0.json
+datasets/DBpedia-H3D/dbpedia_test.0.json
+
+# Local office/temp files
+~$*
+*.xlsx
+*.docx

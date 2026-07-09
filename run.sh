@@ -7,4 +7,5 @@ results_dir="./results"
 
 
 # 调用 Python 脚本并传递参数
-python main.py --dataset_name "$dataset_name" --dataset_dir "$dataset_dir" --results_dir "$results_dir"
+python main.py --dataset_name "$dataset_name" --dataset_dir "$dataset_dir" --results_dir "$results_dir" \
+--hash_name FuzzyHash --similarity_name jaccard

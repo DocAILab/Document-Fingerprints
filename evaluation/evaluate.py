@@ -33,11 +33,16 @@ def score(model: SimilarityModel,
     logging.info(log_msg)
 
     # Get model similarity scores between each query and its candidates
-    start_time = time.time()
+    # 分别统计时间
+    fp_time_total = 0.0
+    sim_time_total = 0.0
+    # 用于存储查询的指纹和相似度
     hashes = dict()
     similarities = dict()
     results = collections.defaultdict(list)
     for query_pid, query_pool in tqdm(list(test_pool.items())):
+        # -------- fingerprint 部分 --------
+        fp_start = time.time()
         if facet is None:
             query_fp = model.get_fp(query_pid, dataset)
         else:
@@ -49,19 +54,25 @@ def score(model: SimilarityModel,
             candidate_fps = [model.get_fp(cpid, dataset) for cpid in candidate_pids]
         else:
             candidate_fps = [model.get_faced_fp(cpid, dataset, facet) for cpid in candidate_pids]
+        fp_time_total += time.time() - fp_start
 
+        # -------- similarity 部分 --------
+        sim_start = time.time()
         # For calculate similarities of each candidate to query fingerprints
         candidate_similarities = dict()
         for cpid in candidate_pids:
             candidate_similarities[cpid] = model.get_similarity(query_fp, candidate_fps[
                 candidate_pids.index(cpid)])
+        sim_time_total += time.time() - sim_start
 
         # sort candidates by similarity, descending (higher score == closer encodings)
         sorted_candidates = sorted(candidate_similarities.items(), key=lambda i: i[1], reverse=True)
         results[query_pid] = [(cpid, sim) for cpid, sim in sorted_candidates]
 
     # write scores
-    logging.info(f'Finished scoring in {time.time() - start_time} seconds')
+    logging.info(f'Total FP time: {fp_time_total:.2f} s')
+    logging.info(f'Total Similarity time: {sim_time_total:.2f} s')
+    logging.info(f'Total combined time: {fp_time_total + sim_time_total:.2f} s')
     with codecs.open(scores_filename, 'w', 'utf-8') as fp:
         json.dump(results, fp)
         logging.info(f'Wrote: {scores_filename}')

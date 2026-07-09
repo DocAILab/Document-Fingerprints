@@ -1,24 +1,23 @@
 # Document Fingerprints
 
-This repository contains the code for **H3D**, an unsupervised benchmark for
-document fingerprinting, similarity search, and text deduplication. It evaluates
-classic locality-sensitive or lexical fingerprinting methods together with
-embedding-based hashing methods on scientific-document similarity datasets.
+This repository contains the code for **H3D**, a benchmark for unsupervised document fingerprinting, similarity search, and fine-grained document deduplication. It compares classic lexical or locality-sensitive fingerprints with embedding-based hashing methods under a shared ranking-evaluation protocol.
 
-Supported fingerprint methods include:
+## Methods
+
+Implemented fingerprint methods:
 
 - `SimHash`
 - `MinHash`
 - `Winnowing`
 - `FuzzyHash`
 - `FlyHash`
-- `BIGAE`
+- `BIGAE` for precomputed external hash codes
 - `EmbedBinHash`
 - `BGEHash`
 - `LSH-BGE`
 - `fc-BGE`
 
-Supported similarity functions include:
+Implemented similarity functions:
 
 - `hamming`
 - `jaccard`
@@ -33,30 +32,31 @@ Supported similarity functions include:
 
 ```text
 .
-|-- main.py                     # Main CLI for scoring and evaluation
-|-- hashes.py                   # Fingerprint generation methods
-|-- similarities.py             # Similarity and distance functions
-|-- embmodels.py                # Embedding-related helpers
-|-- fingerprint.py              # Standalone fingerprint utilities
-|-- requirements.txt            # Python dependencies
-|-- run.sh                      # Example shell command
+|-- main.py                      # Main CLI for scoring and evaluation
+|-- hashes.py                    # Fingerprint generation methods
+|-- similarities.py              # Similarity and distance functions
+|-- embmodels.py                 # Optional embedding helper functions
+|-- fingerprint.py               # Standalone fingerprint utilities
+|-- requirements.txt             # Runtime dependencies
+|-- run.sh                       # Example command template
 |-- evaluation/
-|   |-- dataset.py              # Dataset loader
-|   |-- evaluate.py             # Scoring and metric computation
-|   |-- metrics.py              # MAP, NDCG, precision/recall metrics
-|   |-- model.py                # SimilarityModel wrapper
-|   `-- utils.py                # Result path helpers
-|-- fp_generate_methods/        # Individual fingerprint implementations
-|-- datasets/
-|   |-- CSFCube/
-|   |-- RELISH/
-|   `-- DBpedia/
-`-- results/                    # Generated scores and evaluation files
+|   |-- dataset.py               # Dataset loader
+|   |-- evaluate.py              # Scoring and metric computation
+|   |-- metrics.py               # MAP, NDCG, precision/recall metrics
+|   |-- model.py                 # SimilarityModel wrapper
+|   `-- utils.py                 # Result path helpers
+|-- fp_generate_methods/         # Individual fingerprint implementations
+`-- datasets/
+    |-- CSFCube-H3D/             # Processed CSFCube files and dataset README
+    |-- RELISH-H3D/              # RELISH metadata/annotations and dataset README
+    `-- DBpedia-H3D/             # DBpedia split files and dataset README
 ```
+
+Generated evaluation outputs are written to `results/`, which is intentionally ignored by git.
 
 ## Installation
 
-Create a Python environment and install the dependencies:
+Create a Python environment and install the base dependencies:
 
 ```bash
 conda create -n h3d python=3.10
@@ -64,44 +64,23 @@ conda activate h3d
 pip install -r requirements.txt
 ```
 
-Some dependencies, especially `pyssdeep` / `ssdeep`, can be platform-specific.
-If installation fails on Windows, use the Windows package already listed in
-`requirements.txt` or install the system `ssdeep` library before reinstalling
-the Python package.
+`FuzzyHash` uses ssdeep-style fuzzy hashing. On some systems this may require installing the system `ssdeep` library before installing the Python package.
 
-The embedding-based methods (`BGEHash`, `EmbedBinHash`, `LSH-BGE`, `fc-BGE`)
-expect local BGE model folders under:
+BGE-based methods require optional embedding dependencies:
 
-```text
-FlagEmbedding/bge-base-en-v1.5
-FlagEmbedding/bge-large-en-v1.5
-FlagEmbedding/bge-small-en-v1.5
+```bash
+pip install FlagEmbedding sentence-transformers
 ```
 
-If these folders are not available, start with non-embedding methods such as
-`SimHash`, `MinHash`, `Winnowing`, `FuzzyHash`, or `FlyHash`.
+The default BGE model argument is `BAAI/bge-base-en-v1.5`. You can also pass a local model directory through `--dense_embedding_model`.
 
 ## Data
 
-The evaluation code expects each dataset directory to contain files in the same
-format as the included RELISH and CSFCube folders:
+This repository keeps lightweight metadata, annotations, conversion scripts, and dataset documentation. Some full text or generated files are too large for a normal GitHub code repository and are ignored by git. Recreate them from the original sources with the conversion scripts in each dataset folder.
 
-```text
-datasets/RELISH/
-|-- abstracts-relish.jsonl
-|-- test-pid2anns-relish.json
-|-- relish-queries-release.csv
-`-- relish-evaluation_splits.json
+Each dataset folder has its own `README.md` with source, license, citation, processing, and file-format notes.
 
-datasets/CSFCube/
-|-- abstracts-csfcube.jsonl
-|-- test-pid2anns-csfcube-background.json
-|-- test-pid2anns-csfcube-method.json
-|-- test-pid2anns-csfcube-result.json
-`-- csfcube-queries-release.csv
-```
-
-Each row in `abstracts-<dataset>.jsonl` should contain at least:
+Expected scientific-document JSONL format:
 
 ```json
 {
@@ -111,17 +90,26 @@ Each row in `abstracts-<dataset>.jsonl` should contain at least:
 }
 ```
 
-For CSFCube-style faceted evaluation, each record should also include
-`pred_labels`.
+CSFCube additionally uses `pred_labels` for background, method, and result facet processing.
+
+The H3D/BIGAE-style generated files use:
+
+```json
+{
+  "src": ["text segment", "..."],
+  "tgt": ["target text or none"],
+  "labels": ["paper_id_or_class_label"]
+}
+```
 
 ## Quick Start
 
-Run a full RELISH scoring and evaluation job with MinHash:
+Run MinHash on RELISH:
 
 ```bash
 python main.py \
   --dataset_name relish \
-  --dataset_dir datasets/RELISH \
+  --dataset_dir datasets/RELISH-H3D \
   --hash_name MinHash \
   --similarity_name jaccard \
   --hash_dim 128 \
@@ -134,19 +122,19 @@ Run SimHash with Hamming similarity:
 ```bash
 python main.py \
   --dataset_name relish \
-  --dataset_dir datasets/RELISH \
+  --dataset_dir datasets/RELISH-H3D \
   --hash_name SimHash \
   --similarity_name hamming \
   --hash_dim 128 \
   --run_name simhash_hamming
 ```
 
-Run Winnowing on CSFCube for all facets:
+Run Winnowing on all CSFCube facets:
 
 ```bash
 python main.py \
   --dataset_name csfcube \
-  --dataset_dir datasets/CSFCube \
+  --dataset_dir datasets/CSFCube-H3D \
   --facet all \
   --hash_name Winnowing \
   --similarity_name multiset_jaccard \
@@ -160,33 +148,46 @@ Run LSH-BGE with cosine similarity:
 ```bash
 python main.py \
   --dataset_name relish \
-  --dataset_dir datasets/RELISH \
+  --dataset_dir datasets/RELISH-H3D \
   --hash_name LSH-BGE \
   --similarity_name cosine \
-  --dense_embedding_model bge-base-en-v1.5 \
+  --dense_embedding_model BAAI/bge-base-en-v1.5 \
   --lsh_num_bucket 8 \
   --lsh_hash_size 128 \
   --run_name lsh_bge_8_128
 ```
 
-## Common Command-Line Arguments
+To recompute metrics from existing scores without rescoring:
+
+```bash
+python main.py \
+  --dataset_name relish \
+  --dataset_dir datasets/RELISH-H3D \
+  --hash_name MinHash \
+  --similarity_name jaccard \
+  --run_name minhash_jaccard \
+  --actions evaluate
+```
+
+## CLI Arguments
 
 | Argument | Description |
 | --- | --- |
-| `--dataset_name` | Dataset name. Common values: `relish`, `csfcube`. |
-| `--dataset_dir` | Directory containing the dataset files. |
-| `--results_dir` | Base directory for generated outputs. Default: `results`. |
+| `--dataset_name` | Dataset key used for file names, usually `relish` or `csfcube`. |
+| `--dataset_dir` | Dataset directory, such as `datasets/RELISH-H3D`. |
+| `--results_dir` | Output base directory. Default: `results`. |
 | `--facet` | CSFCube facet: `background`, `method`, `result`, or `all`. |
-| `--actions` | Run `score`, `evaluate`, or both. Default: both. |
+| `--actions` | Run `score`, `evaluate`, or both. |
 | `--hash_name` | Fingerprint method. |
 | `--similarity_name` | Similarity or distance function. |
 | `--hash_dim` | Fingerprint size for methods such as SimHash and MinHash. |
 | `--ngram` | N-gram size used by MinHash and Winnowing. |
 | `--winnowing_window` | Window size used by Winnowing. |
 | `--run_name` | Output subdirectory name for this run. |
-| `--dense_embedding_model` | Local BGE model folder name. |
+| `--dense_embedding_model` | Hugging Face model name or local path for BGE-based methods. |
 | `--lsh_num_bucket` | Number of LSH buckets for `LSH-BGE`. |
 | `--lsh_hash_size` | Total hash size for `LSH-BGE`. |
+| `--hash_path` | Path to precomputed hash codes for `BIGAE`. |
 
 ## Outputs
 
@@ -196,59 +197,19 @@ Results are written under:
 results/<dataset_name>/<hash_name+similarity_name>/<run_name>/
 ```
 
-For `LSH-BGE`, the output folder includes the LSH parameters:
+Typical output files:
 
-```text
-results/<dataset_name>/LSH-BGE-<similarity>-<lsh_num_bucket>-<lsh_hash_size>/<run_name>/
-```
-
-Typical output files are:
-
-- `scores.json` or `scores-<facet>.json`: ranked candidate papers for each query.
-- `query-evaluations.csv` or `query-evaluations-<facet>.csv`: per-query metrics.
-- `aggregated-evaluations.csv` or `aggregated-evaluations-<facet>.csv`: averaged metrics.
-- `run.log`: runtime and evaluation logs.
+- `scores.json` or `scores-<facet>.json`
+- `query-evaluations.csv` or `query-evaluations-<facet>.csv`
+- `aggregated-evaluations.csv` or `aggregated-evaluations-<facet>.csv`
+- `run.log`
 
 The main reported metrics include average precision and `NDCG@20`.
 
-## Reproducing Multiple Runs
+## Dataset Citations
 
-You can use `run.sh` as a template:
-
-```bash
-bash run.sh
-```
-
-Or run several method and similarity combinations manually:
-
-```bash
-python main.py --dataset_name relish --dataset_dir datasets/RELISH --hash_name MinHash --similarity_name jaccard --run_name minhash_jaccard
-python main.py --dataset_name relish --dataset_dir datasets/RELISH --hash_name SimHash --similarity_name hamming --run_name simhash_hamming
-python main.py --dataset_name csfcube --dataset_dir datasets/CSFCube --facet all --hash_name Winnowing --similarity_name multiset_jaccard --run_name winnowing_all_facets
-```
-
-To recompute metrics from an existing `scores.json` without rescoring:
-
-```bash
-python main.py \
-  --dataset_name relish \
-  --dataset_dir datasets/RELISH \
-  --hash_name MinHash \
-  --similarity_name jaccard \
-  --run_name minhash_jaccard \
-  --actions evaluate
-```
-
-## Notes
-
-- `FuzzyHash` uses ssdeep-style fuzzy hashing and may require longer text to
-  produce useful fingerprints.
-- `BIGAE` expects precomputed hash files passed through `--hash_path`.
-- `wmd` may require extra model downloads and can be slow on large datasets.
-- Large datasets and embedding-based methods can take substantial time; start
-  with a small run or a classic hashing method when checking the environment.
+Please cite the original datasets when using their processed H3D versions. The dataset-specific README files include BibTeX entries and license notes for CSFCube, RELISH-Aspire, and DBpedia-derived data.
 
 ## Citation
 
-If you use this repository, please cite the associated H3D paper/preprint when
-it becomes available.
+If you use this repository, please cite the associated H3D paper/preprint when it becomes available.

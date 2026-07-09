@@ -27,3 +27,4 @@ numpy
 openpyxl
 python-mmdt
 ssdeep-windows-32-64
+sentence-transformers

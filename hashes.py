@@ -150,8 +150,10 @@ def fp_with_winnowing(text, n=5, w=5, hash_func=None):
     min_hashes = []
 
     # 找到初始窗口中的最小哈希值(若有重复选最右边)
-    min_pos, min_hash = 0, hashes[0]
-
+    try:
+        min_pos, min_hash = 0, hashes[0]
+    except:
+        raise ValueError("test is empty?")
     for i, x in enumerate(hashes[0:w]):
         if x <= min_hash:
             min_pos, min_hash = i, x
@@ -195,6 +197,7 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         FlyHash 是一种 LSH 算法，它将输入数据映射到稀疏哈希嵌入， 其中哈希嵌入的维度远大于输入， 并将输入数据的位置保留在哈希嵌入中。
         FlyHash被设计为计算成本低廉，但内存效率低。它适用于散列中小型数据 （~10-1000）到大哈希嵌入（~100-10000）
         此函数采用tfidf把文本转化为向量，然后使用flyhash进行哈希
+        最好所有文档一次性传入调用，因为会计算所有文档的tf-idf
         :param data: 输入数据, 一个列表，可以一维或二维
         :param hash_dim: 输出数据的维度，int
         :param k: 把hash映射到高维的比例，int。需要保证hash_dim*k>tfidf_matrix的维度，论文中设置为20
@@ -229,6 +232,47 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         sub_answer = [1 if (sum(sublist[i * k:i * k + k - 1]) > 0) else 0 for i in range(hash_dim)]
         answer.append("".join(map(str, sub_answer)))
     return str(answer)
+
+
+def fp_with_EmbedBinHash(text, model):
+    x = model.encode(text)
+    x = x.reshape((128, -1))
+    x = ((np.sign(np.mean(x, axis=1)) + 1) // 2).astype(np.uint8) # # 每行求均值、符号二值化
+
+    return x
+
+
+def fp_with_BGEHash(text, model): # 直接返回稠密向量 embedding，不做哈希压缩。
+    x = model.encode(text)
+    return x
+
+
+def fp_with_fc_bge(text, model, weight): # 先用一个预定义的随机权重矩阵（weight）将高维 embedding 压缩到 128 维，再做二值化。
+    x = model.encode(text)
+    result = np.dot(x, weight)
+
+    return np.where(result >= 0, 1, 0)
+
+def fp_with_LSH_BGEHash(text, model, k=8, total_bits=128, seed=123):
+    """
+    按论文思路把 BGE embedding 转成二值 hash（长度 total_bits）
+    1. 划分成 k 段
+    2. 每段用 r 个随机超平面生成 r 位 hash
+    3. 拼接成 total_bits 位
+    """
+    np.random.seed(seed)
+    vec = model.encode(text)
+    dim = len(vec)
+    assert total_bits % k == 0, "total_bits 必须能被 k 整除"
+    r = total_bits // k
+    block_size = dim // k
+    hash_bits = []
+    for i in range(k):
+        block = vec[i * block_size:(i + 1) * block_size]
+        planes = np.random.randn(r, block_size)
+        bits = (np.dot(planes, block) > 0).astype(np.uint8)
+        hash_bits.extend(bits)
+    return np.array(hash_bits, dtype=np.uint8)
 
 
 if __name__ == "__main__":

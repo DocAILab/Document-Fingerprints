@@ -36,7 +36,7 @@ def fp_with_flyhash(data, hash_dim, k=20, density=0.1, sparsity=0.05, tokenizer=
         # 缩减成1/k长度。每k个相加，如果大于0，则结果为1否则为0。存成01字符串
         sub_answer = [1 if (sum(sublist[i * k:i * k + k - 1]) > 0) else 0 for i in range(hash_dim)]
         answer.append("".join(map(str, sub_answer)))
-    return str(answer)
+    return answer
 
 
 def fp_with_flyhash2(data, hash_dim, k=20, density=0.1, sparsity=0.05):
@@ -69,6 +69,9 @@ def fp_with_flyhash2(data, hash_dim, k=20, density=0.1, sparsity=0.05):
         sub_answer = [1 if (sum(sublist[i * k:i * k + k - 1]) > 0) else 0 for i in range(hash_dim)]
         answer.append("".join(map(str, sub_answer)))
     return answer
+
+
+
 
 
 def calculate_similarity(fingerprint1, fingerprint2):

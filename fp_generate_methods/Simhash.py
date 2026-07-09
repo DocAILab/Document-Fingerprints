@@ -40,6 +40,9 @@ if __name__ == '__main__':
     print(f"文件指纹1: {bin(fingerprint1.value)}")  # 不准确的二进制形式，可能会缺少前导0
     print(f"文件指纹2: {bin(fingerprint2.value)}")
     print(f"文件指纹3: {bin(fingerprint3.value)}")
+    print(f"文件指纹1中0的个数: {bin(fingerprint1.value)[2:].count('0')}")
+    print(f"文件指纹2中0的个数: {bin(fingerprint2.value)[2:].count('0')}")
+    print(f"文件指纹3中0的个数: {bin(fingerprint3.value)[2:].count('0')}")
 
     # 计算相似度
     similarity_12 = calculate_similarity(fingerprint1, fingerprint2)
